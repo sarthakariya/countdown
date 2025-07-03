@@ -3,258 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Our Special Countdown! 🌌🚀</title>
+    <title>Our Special Countdown! 🌊☀️✨</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Press+Start+2P&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        /* Keyframe Animations */
-        @keyframes fadeInScale {
-            from { opacity: 0; transform: scale(0.8); }
-            to { opacity: 1; transform: scale(1); }
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.03); }
-            100% { transform: scale(1); }
-        }
-
-        @keyframes sunMoonMovement {
-            0% { transform: translate(-50%, -50%) scale(1); }
-            50% { transform: translate(-50%, -60%) scale(1.05); }
-            100% { transform: translate(-50%, -50%) scale(1); }
-        }
-
-        @keyframes birdFly {
-            0% { transform: translateX(-100vw) translateY(0); }
-            100% { transform: translateX(100vw) translateY(50px); }
-        }
-
-        @keyframes planeFly {
-            0% { transform: translateX(-120vw) translateY(0) scale(0.8); }
-            100% { transform: translateX(100vw) translateY(-50px) scale(0.8); }
-        }
-
-        @keyframes shootingStar {
-            0% { transform: translate(100vw, -100vh) rotate(45deg); opacity: 0; }
-            5% { opacity: 1; }
-            100% { transform: translate(-100vw, 100vh) rotate(45deg); opacity: 0; }
-        }
-
-        @keyframes waterMovement {
-            0% { background-position: 0% 0%; }
-            100% { background-position: 100% 0%; }
-        }
-        
-        @keyframes blinkCaret {
-            50% { border-color: transparent; }
-        }
-        
-        @keyframes typing {
-            from { width: 0; }
-            to { width: 100%; }
-        }
-
-        @keyframes numberBounce {
-            0%, 100% { transform: translateY(0); }
-            25% { transform: translateY(-5px); }
-            50% { transform: translateY(0); }
-            75% { transform: translateY(-2px); }
-        }
-
-        /* Base Styles */
-        html {
-            scroll-behavior: smooth;
-        }
-
-        body {
-            font-family: 'Roboto Mono', monospace; /* Typewriter-like font */
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start; /* Align content to top for scrolling */
-            align-items: center;
-            min-height: 200vh; /* Make it scrollable */
-            margin: 0;
-            padding: 20px;
-            box-sizing: border-box;
-            color: #fff;
-            background: var(--sky-gradient); /* Dynamic sky gradient */
-            overflow-x: hidden; /* Prevent horizontal scroll */
-            position: relative;
-            transition: background 2s ease-in-out;
-        }
-
-        /* Dynamic Background Elements */
-        .sky-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: var(--sky-height); /* Dynamic sky height */
-            background: var(--sky-gradient);
-            transition: background 2s ease-in-out, height 2s ease-in-out;
-            z-index: 0;
-        }
-
-        .sea-bg {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: var(--sea-height); /* Dynamic sea height */
-            background: var(--sea-gradient);
-            background-size: 200% 100%; /* For wave animation */
-            animation: waterMovement 30s linear infinite;
-            border-top-left-radius: 50% 10%; /* Gentle wave shape */
-            border-top-right-radius: 50% 10%;
-            transition: background 2s ease-in-out, height 2s ease-in-out;
-            z-index: 1;
-        }
-
-        .sun-moon {
-            position: fixed;
-            width: var(--celestial-size);
-            height: var(--celestial-size);
-            background: var(--celestial-color);
-            border-radius: 50%;
-            filter: blur(var(--celestial-blur));
-            top: var(--celestial-top);
-            left: var(--celestial-left);
-            animation: sunMoonMovement 20s ease-in-out infinite alternate;
-            z-index: 2;
-            transition: all 2s ease-in-out;
-        }
-
-        .bird {
-            position: fixed;
-            font-size: 2em;
-            color: #333;
-            animation: birdFly 15s linear infinite;
-            z-index: 3;
-            opacity: 0.8;
-        }
-        .bird:nth-child(2) { animation-delay: 5s; animation-duration: 18s; transform: scaleX(-1); left: 100vw;}
-        .bird:nth-child(3) { animation-delay: 10s; animation-duration: 12s; top: 20%; }
-
-        .plane {
-            position: fixed;
-            font-size: 2.5em;
-            color: #ccc;
-            animation: planeFly 25s linear infinite;
-            z-index: 4;
-            opacity: 0.6;
-        }
-        .plane:nth-child(2) { animation-delay: 12s; animation-duration: 28s; transform: scaleX(-1); left: 100vw; top: 15%;}
-
-        .shooting-star {
-            position: fixed;
-            width: 5px;
-            height: 5px;
-            background: white;
-            box-shadow: 0 0 10px white, 0 0 20px rgba(255, 255, 255, 0.8), 0 0 30px rgba(255, 255, 255, 0.6);
-            border-radius: 50%;
-            animation: shootingStar 4s linear infinite;
-            z-index: 5;
-            display: var(--star-display, none); /* Hide during day */
-        }
-        .shooting-star:nth-child(2) { animation-delay: 2s; animation-duration: 5s; }
-        .shooting-star:nth-child(3) { animation-delay: 6s; animation-duration: 3s; }
-
-        /* Content Container */
-        .content-container {
-            position: relative; /* Allows content to scroll over background */
-            z-index: 10; /* Ensure content is above background elements */
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            align-items: center;
-            width: 100%;
-            padding-top: 50px; /* Space from top edge */
-            padding-bottom: 100px; /* Space for scrolling */
-            min-height: 100vh; /* Ensure content starts from here */
-        }
-
-        .card {
-            background-color: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
-            padding: 20px 25px;
-            margin: 15px 0; /* Smaller margins */
-            max-width: 700px; /* Max width for readability */
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            animation: fadeInScale 1s ease-out;
-            text-align: center;
-            width: 90%; /* Responsive width */
-            box-sizing: border-box;
-        }
-
-        h1 {
-            font-family: 'Pacifico', cursive;
-            font-size: 2.2em; /* Smaller title */
-            margin-bottom: 15px;
-            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
-            color: #FFD700;
-        }
-
-        #greeting {
-            font-family: 'Press Start 2P', cursive; /* Retro pixel font for greeting */
-            font-size: 1.1em; /* Smaller greeting */
-            font-weight: normal;
-            margin-bottom: 10px;
-            color: #FFD700;
-            animation: pulse 2s infinite ease-in-out;
-            white-space: nowrap; /* Keep on one line */
-            overflow: hidden; /* Hide overflow for typing effect */
-            border-right: .15em solid orange; /* The caret */
-            animation: typing 1s steps(20, end), blinkCaret .75s step-end infinite;
-        }
-
-        #countdown {
-            font-family: 'Press Start 2P', cursive; /* Retro pixel font for countdown */
-            font-size: 2.5em; /* Smaller countdown */
-            font-weight: bold;
-            margin-bottom: 20px;
-            letter-spacing: 2px;
-            color: #e0ffff;
-            text-shadow: 2px 2px 7px rgba(0, 0, 0, 0.4);
-            animation: fadeInScale 1.2s ease-out;
-            transition: transform 0.2s ease-out;
-        }
-
-        #countdown .number {
-            display: inline-block;
-            animation: numberBounce 1s ease-out infinite; /* Bounce animation */
-            animation-delay: var(--delay);
-            padding: 0 3px; /* Small padding for spacing */
-        }
-
-        .message-box {
-            border-left: 4px solid #FFC0CB; /* Smaller border */
-            padding: 15px 20px; /* Smaller padding */
-            font-size: 0.95em; /* Smaller text */
-            line-height: 1.6;
-        }
-
-        .emoji {
-            font-size: 1.5em; /* Smaller emojis */
-            margin-right: 8px;
-            vertical-align: middle;
-        }
-
-        .question-box {
-            font-size: 0.9em; /* Smaller text */
-            margin-top: 20px;
-            padding: 12px 18px;
-            border-radius: 8px;
-        }
-
-        .note {
-            margin-top: 30px;
-            font-size: 0.8em; /* Smaller text */
-            color: rgba(255, 255, 255, 0.7);
-        }
-    </style>
+    
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -262,218 +15,51 @@
     <div class="sea-bg"></div>
     <div class="sun-moon"></div>
 
-    <span class="bird">🐦</span>
-    <span class="bird">🐦</span>
-    <span class="bird">🐦</span>
-    <span class="plane">✈️</span>
-    <span class="plane">✈️</span>
+    <span class="bird" style="--bird-y-start: 10%; --bird-y-end: 60px;">🐦</span>
+    <span class="bird" style="--bird-y-start: 25%; --bird-y-end: -30px;">🐦</span>
+    <span class="bird" style="--bird-y-start: 5%; --bird-y-end: 20px;">🐦</span>
+    <span class="plane" style="--plane-y-start: 10%; --plane-y-end: -10px;">✈️</span>
+    <span class="plane" style="--plane-y-start: 20%; --plane-y-end: 40px;">✈️</span>
 
     <div class="shooting-star"></div>
     <div class="shooting-star"></div>
     <div class="shooting-star"></div>
 
     <div class="content-container">
-        <div class="card">
+        <div class="card" id="greetingCard">
             <div id="greeting"></div>
-            <h1>Our Next Meeting! ✨</h1>
+            <h1 class="typewriter-text-h1">Our Next Meeting! ✨</h1>
             <div id="countdown"></div>
         </div>
 
-        <div class="card message-box">
-            <p><span class="emoji">💫</span> Always remember, the best is yet to come, and every day brings us closer!</p>
-            <p><span class="emoji">💖</span> You've got this, Sarthak! Make today amazing.</p>
+        <div class="card message-box" id="messageCard1">
+            <p><span class="emoji">💫</span> <span class="typewriter-text typed-once">Always remember, the best is yet to come, and every day brings us closer!</span></p>
+        </div>
+        <div class="card message-box" id="messageCard2">
+            <p><span class="emoji">💖</span> <span class="typewriter-text typed-once">You've got this, Sarthak! Make today amazing.</span></p>
         </div>
 
-        <div class="card question-box" id="dailyQuestion"></div>
-
-        <div class="card note">
-            <p>Counting down to school starting at 11:30 AM IST tomorrow, July 4th, 2025.</p>
-            <p style="font-size: 0.7em; margin-top: 10px;">(Scroll down for more amazingness!) 🎉</p>
+        <div class="card question-box" id="questionCard">
+            <span class="typewriter-text typed-once" id="dailyQuestion"></span>
         </div>
 
-        <div class="card" style="margin-top: 100px; padding: 30px; font-size: 1.1em;">
-            <p>Hey Sarthak! Hope you're doing great. This is a space for all those little things that make your day brighter.</p>
-            <p>Think about a happy memory, or a fun plan you have. Keep shining!</p>
-            <p style="font-size: 0.8em; margin-top: 15px;">"The greatest glory in living lies not in never falling, but in rising every time we fall." - Nelson Mandela</p>
+        <div class="card note" id="noteCard">
+            <p><span class="typewriter-text typed-once">Counting down to school starting at 11:30 AM IST tomorrow, July 4th, 2025.</span></p>
+            <p style="font-size: 0.7em; margin-top: 10px;"><span class="typewriter-text typed-once" style="--typing-delay: 0.5s;">(Scroll down for more!) 🎉</span></p>
         </div>
-         <div class="card" style="margin-top: 50px; padding: 30px; font-size: 1.1em;">
-            <p>And remember, Mammam sends her love! ❤️</p>
-            <p>She always says, "Every day is a new adventure, embrace it!"</p>
+
+        <div class="card" style="margin-top: 100px; padding: 30px;" id="extraCard1">
+            <p><span class="typewriter-text typed-once">Hey Sarthak! Hope you're doing great. This is a space for all those little things that make your day brighter.</span></p>
+            <p style="margin-top: 15px;"><span class="typewriter-text typed-once" style="--typing-delay: 1s;">Think about a happy memory, or a fun plan you have. Keep shining!</span></p>
+            <p style="font-size: 0.8em; margin-top: 15px;"><span class="typewriter-text typed-once" style="--typing-delay: 1.5s;">"The greatest glory in living lies not in never falling, but in rising every time we fall." - Nelson Mandela</span></p>
+        </div>
+        <div class="card" style="margin-top: 50px; padding: 30px;" id="extraCard2">
+            <p><span class="typewriter-text typed-once">"Success is not final, failure is not fatal: it is the courage to continue that counts." - Winston Churchill</span></p>
+            <p style="margin-top: 15px;"><span class="typewriter-text typed-once" style="--typing-delay: 0.5s;">Remember to always be curious and keep exploring new things!</span></p>
         </div>
     </div>
 
-    <script>
-        // --- Particle background effect (using existing particles, could add more for night stars) ---
-        function createParticles(count, minSize, maxSize, animationDuration, animationDelay) {
-            const body = document.body;
-            for (let i = 0; i < count; i++) {
-                const particle = document.createElement('div');
-                particle.classList.add('particle');
-                const size = Math.random() * (maxSize - minSize) + minSize;
-                particle.style.width = `${size}px`;
-                particle.style.height = `${size}px`;
-                particle.style.left = `${Math.random() * 100}vw`;
-                particle.style.top = `${Math.random() * 100}vh`;
-                particle.style.animationDelay = `${Math.random() * animationDelay}s`;
-                particle.style.animationDuration = `${Math.random() * animationDuration + 5}s`;
-                body.appendChild(particle);
-            }
-        }
-        createParticles(100, 1, 3, 5, 5); // Many small particles for general ambient effect
-
-        // --- Dynamic Background (Sky, Sea, Sun/Moon, and Animated Elements) ---
-        function setDynamicBackgroundAndElements() {
-            const now = new Date();
-            const hour = now.getHours();
-            let skyGradient, seaGradient, celestialColor, celestialSize, celestialBlur, celestialTop, celestialLeft;
-            let birdDisplay = 'block', planeDisplay = 'block', starDisplay = 'none';
-            let skyHeight = '70%', seaHeight = '30%'; // Default heights
-
-            if (hour >= 5 && hour < 7) { // Early Morning / Sunrise (5 AM - 6:59 AM)
-                skyGradient = 'linear-gradient(to bottom, #FFDAB9, #FFB6C1, #87CEEB)'; // Peach, LightPink, SkyBlue
-                seaGradient = 'linear-gradient(to right, #4682B4, #6495ED)'; // SteelBlue, CornflowerBlue
-                celestialColor = '#FF8C00'; // DarkOrange (Sun)
-                celestialSize = '80px';
-                celestialBlur = '25px';
-                celestialTop = '25%';
-                celestialLeft = '20%';
-            } else if (hour >= 7 && hour < 12) { // Morning / Day (7 AM - 11:59 AM)
-                skyGradient = 'linear-gradient(to bottom, #87CEEB, #ADD8E6, #B0E0E6)'; // SkyBlue, LightBlue, PowderBlue
-                seaGradient = 'linear-gradient(to right, #1E90FF, #4169E1)'; // DodgerBlue, RoyalBlue
-                celestialColor = '#FFD700'; // Gold (Sun)
-                celestialSize = '90px';
-                celestialBlur = '30px';
-                celestialTop = '15%';
-                celestialLeft = '50%';
-            } else if (hour >= 12 && hour < 17) { // Afternoon (12 PM - 4:59 PM)
-                skyGradient = 'linear-gradient(to bottom, #6A5ACD, #483D8B, #191970)'; // SlateBlue, DarkSlateBlue, MidnightBlue
-                seaGradient = 'linear-gradient(to right, #000080, #191970)'; // Navy, MidnightBlue
-                celestialColor = '#FFA500'; // Orange (Sun)
-                celestialSize = '85px';
-                celestialBlur = '28px';
-                celestialTop = '20%';
-                celestialLeft = '80%';
-            } else if (hour >= 17 && hour < 19) { // Sunset (5 PM - 6:59 PM)
-                skyGradient = 'linear-gradient(to bottom, #FF6347, #FF4500, #8B0000)'; // Tomato, OrangeRed, DarkRed
-                seaGradient = 'linear-gradient(to right, #4169E1, #6A5ACD)'; // RoyalBlue, SlateBlue
-                celestialColor = '#FFD700'; // Gold (Sun)
-                celestialSize = '100px';
-                celestialBlur = '40px';
-                celestialTop = '40%';
-                celestialLeft = '50%';
-            } else { // Night (7 PM - 4:59 AM)
-                skyGradient = 'linear-gradient(to bottom, #000033, #000066, #191970)'; // Darker blues for night
-                seaGradient = 'linear-gradient(to right, #000033, #000066)'; // Very dark blue for night sea
-                celestialColor = '#E0E0E0'; // White (Moon)
-                celestialSize = '70px';
-                celestialBlur = '15px';
-                celestialTop = '10%';
-                celestialLeft = '70%';
-                
-                starDisplay = 'block'; // Show shooting stars at night
-                birdDisplay = 'none'; // Hide birds at night
-                planeDisplay = 'none'; // Hide planes at night
-            }
-
-            document.documentElement.style.setProperty('--sky-gradient', skyGradient);
-            document.documentElement.style.setProperty('--sea-gradient', seaGradient);
-            document.documentElement.style.setProperty('--celestial-color', celestialColor);
-            document.documentElement.style.setProperty('--celestial-size', celestialSize);
-            document.documentElement.style.setProperty('--celestial-blur', celestialBlur);
-            document.documentElement.style.setProperty('--celestial-top', celestialTop);
-            document.documentElement.style.setProperty('--celestial-left', celestialLeft);
-
-            // Set display for animated elements
-            document.querySelectorAll('.bird').forEach(el => el.style.display = birdDisplay);
-            document.querySelectorAll('.plane').forEach(el => el.style.display = planeDisplay);
-            document.querySelectorAll('.shooting-star').forEach(el => el.style.display = starDisplay);
-            
-            // Adjust sky/sea height for parallax effect (simplified for fixed position)
-            document.documentElement.style.setProperty('--sky-height', skyHeight);
-            document.documentElement.style.setProperty('--sea-height', seaHeight);
-        }
-        setDynamicBackgroundAndElements();
-        setInterval(setDynamicBackgroundAndElements, 60 * 60 * 1000); // Update every hour
-
-        // --- Greeting for Reechita (with typing effect) ---
-        function updateGreeting() {
-            const now = new Date();
-            const hour = now.getHours();
-            let baseGreeting;
-
-            if (hour >= 5 && hour < 12) {
-                baseGreeting = "Good Morning, Reechita! ☀️";
-            } else if (hour >= 12 && hour < 18) {
-                baseGreeting = "Good Afternoon, Reechita! 🌤️";
-            } else {
-                baseGreeting = "Good Evening, Reechita! 🌙";
-            }
-            
-            const greetingElement = document.getElementById('greeting');
-            greetingElement.style.width = '0'; // Reset width for typing effect
-            greetingElement.textContent = baseGreeting;
-            greetingElement.style.animation = 'typing 1.5s steps(28, end) forwards, blinkCaret .75s step-end infinite';
-        }
-        updateGreeting();
-
-        // --- Rotating Questions ---
-        const questions = [
-            "What's one thing you're looking forward to today?",
-            "If you could have any superpower, what would it be?",
-            "What's your favorite memory with her so far?",
-            "What's a small act of kindness you can do today?",
-            "What's your go-to song when you need a boost?",
-            "What's something new you want to learn?",
-            "If you could travel anywhere, where would you go?",
-            "What makes you smile the most?",
-            "What's your favorite thing about being in school?",
-            "What's a dream you have for the future?",
-            "What's one thing you appreciate about her?",
-            "If you could spend a day doing anything, what would it be?",
-            "What's your favorite subject in school?",
-            "What's a funny memory you have?",
-            "What's a goal you're working towards right now?",
-            "What's your favorite way to relax?",
-            "If you could give one piece of advice to your past self, what would it be?",
-            "What's your favorite season and why?",
-            "What's a book or movie that has inspired you?",
-            "What's something you're grateful for today?"
-        ];
-
-        function displayRandomQuestion() {
-            const randomIndex = Math.floor(Math.random() * questions.length);
-            document.getElementById('dailyQuestion').textContent = questions[randomIndex];
-        }
-        displayRandomQuestion(); // Display a question on load
-
-        // --- Countdown Timer Logic (with number bounce) ---
-        const targetDate = new Date("July 4, 2025 11:30:00 GMT+0530"); // Target: July 4th, 2025 11:30 AM IST
-        const countdownElement = document.getElementById('countdown');
-
-        function updateCountdown() {
-            const now = new Date().getTime();
-            const distance = targetDate.getTime() - now;
-
-            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-            if (distance < 0) {
-                countdownElement.innerHTML = "It's time! School has started! 🎉";
-                clearInterval(countdownInterval);
-            } else {
-                countdownElement.innerHTML =
-                    `<span class="number" style="--delay: 0s;">${days > 0 ? days + "d " : ""}</span>` +
-                    `<span class="number" style="--delay: 0.1s;">${hours < 10 ? "0" + hours : hours}h </span>` +
-                    `<span class="number" style="--delay: 0.2s;">${minutes < 10 ? "0" + minutes : minutes}m </span>` +
-                    `<span class="number" style="--delay: 0.3s;">${seconds < 10 ? "0" + seconds : seconds}s</span>`;
-            }
-        }
-
-        const countdownInterval = setInterval(updateCountdown, 1000);
-        updateCountdown();
-    </script>
+    <script src="script.js"></script>
 
 </body>
 </html>
