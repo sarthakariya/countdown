@@ -1,31 +1,34 @@
 /* --- Keyframe Animations --- */
-/* For smooth reveal and gentle pop-in */
 @keyframes fadeInScale {
     from { opacity: 0; transform: scale(0.9); }
     to { opacity: 1; transform: scale(1); }
 }
 
-/* Subtle pulsing effect for the greeting */
 @keyframes pulse {
     0% { transform: scale(1); }
-    50% { transform: scale(1.02); } /* Reduced pulse for realism */
+    50% { transform: scale(1.02); }
     100% { transform: scale(1); }
 }
 
-/* Sun/Moon gentle bobbing movement */
 @keyframes sunMoonMovement {
     0% { transform: translate(-50%, -50%) scale(1); }
-    50% { transform: translate(-50%, -52%) scale(1.01); } /* More subtle movement */
+    50% { transform: translate(-50%, -52%) scale(1.01); }
     100% { transform: translate(-50%, -50%) scale(1); }
 }
 
-/* Birds flying across the screen */
+/* Birds and Planes - Ensure they are hidden by default */
+.bird, .plane {
+    display: none; /* Permanently hide these elements */
+    position: fixed; /* Keep position properties for other potential uses if display changes */
+    /* Keeping other animation/styling properties, though they won't be visible */
+}
+
+/* Original bird/plane animations (won't run due to display: none) */
 @keyframes birdFly {
     0% { transform: translateX(-100vw) translateY(var(--bird-y-start, 0)); }
     100% { transform: translateX(100vw) translateY(var(--bird-y-end, 50px)); }
 }
 
-/* Planes flying across the screen */
 @keyframes planeFly {
     0% { transform: translateX(-120vw) translateY(var(--plane-y-start, 0)) scale(0.8); }
     100% { transform: translateX(100vw) translateY(var(--plane-y-end, -50px)) scale(0.8); }
@@ -58,7 +61,7 @@
 /* Slight bounce for countdown numbers */
 @keyframes numberBounce {
     0%, 100% { transform: translateY(0); }
-    25% { transform: translateY(-3px); } /* Reduced bounce for subtle effect */
+    25% { transform: translateY(-3px); }
     50% { transform: translateY(0); }
     75% { transform: translateY(-1px); }
 }
@@ -72,22 +75,22 @@
 
 /* --- Base Styles --- */
 html {
-    scroll-behavior: smooth; /* Smooth scrolling */
+    scroll-behavior: smooth;
 }
 
 body {
-    font-family: 'Roboto Mono', monospace; /* Typewriter-like font */
+    font-family: 'Roboto Mono', monospace;
     display: flex;
     flex-direction: column;
-    justify-content: flex-start; /* Align content to top for scrolling */
+    justify-content: flex-start;
     align-items: center;
-    min-height: 200vh; /* Ensures scrollability for all cards */
+    min-height: 200vh;
     margin: 0;
-    padding: 0; /* Remove body padding, content-container handles spacing */
+    padding: 0;
     box-sizing: border-box;
     color: #fff;
-    overflow-x: hidden; /* Prevent horizontal scroll */
-    position: relative; /* For absolute positioning of background elements */
+    overflow-x: hidden;
+    position: relative;
 }
 
 /* --- Dynamic Background Elements (Fixed Position) --- */
@@ -96,10 +99,10 @@ body {
     top: 0;
     left: 0;
     width: 100%;
-    height: var(--sky-height); /* Controlled by JS */
-    background: var(--sky-gradient); /* Controlled by JS for time of day */
-    transition: background 2s ease-in-out, height 2s ease-in-out; /* Smooth transitions */
-    z-index: 0; /* Behind everything */
+    height: var(--sky-height);
+    background: var(--sky-gradient);
+    transition: background 2s ease-in-out, height 2s ease-in-out;
+    z-index: 0;
 }
 
 .sea-bg {
@@ -107,51 +110,29 @@ body {
     bottom: 0;
     left: 0;
     width: 100%;
-    height: var(--sea-height); /* Controlled by JS */
-    background: var(--sea-gradient); /* Controlled by JS for time of day */
-    background-size: 200% 100%; /* For horizontal wave animation */
-    animation: waterMovement 30s linear infinite; /* Constant wave animation */
-    border-top-left-radius: 50% 10%; /* Gentle wave shape at horizon */
+    height: var(--sea-height);
+    background: var(--sea-gradient);
+    background-size: 200% 100%;
+    animation: waterMovement 30s linear infinite;
+    border-top-left-radius: 50% 10%;
     border-top-right-radius: 50% 10%;
-    transition: background 2s ease-in-out, height 2s ease-in-out; /* Smooth transitions */
-    z-index: 1; /* Above sky, below content */
+    transition: background 2s ease-in-out, height 2s ease-in-out;
+    z-index: 1;
 }
 
 .sun-moon {
     position: fixed;
-    width: var(--celestial-size); /* Controlled by JS */
-    height: var(--celestial-size); /* Controlled by JS */
-    background: var(--celestial-color); /* Controlled by JS */
+    width: var(--celestial-size);
+    height: var(--celestial-size);
+    background: var(--celestial-color);
     border-radius: 50%;
-    filter: blur(var(--celestial-blur)); /* Controlled by JS for glow */
-    top: var(--celestial-top); /* Controlled by JS for position */
-    left: var(--celestial-left); /* Controlled by JS for position */
-    animation: sunMoonMovement 20s ease-in-out infinite alternate; /* Gentle bobbing */
-    z-index: 2; /* Above sea, below content */
-    transition: all 2s ease-in-out; /* Smooth transitions */
+    filter: blur(var(--celestial-blur)); /* Controlled by JS for glow and dimness */
+    top: var(--celestial-top);
+    left: var(--celestial-left);
+    animation: sunMoonMovement 20s ease-in-out infinite alternate;
+    z-index: 2;
+    transition: all 2s ease-in-out;
 }
-
-/* Animated elements: birds, planes, shooting stars */
-.bird {
-    position: fixed;
-    font-size: 2em;
-    color: var(--bird-color); /* Controlled by JS */
-    animation: birdFly 15s linear infinite;
-    z-index: 3; /* Above sun/moon */
-    opacity: 0.8;
-}
-.bird:nth-child(2) { animation-delay: 5s; animation-duration: 18s; transform: translateX(-100vw) translateY(var(--bird-y-start, 0)) scaleX(-1); }
-.bird:nth-child(3) { animation-delay: 10s; animation-duration: 12s; top: 20%; }
-
-.plane {
-    position: fixed;
-    font-size: 2.5em;
-    color: var(--plane-color); /* Controlled by JS */
-    animation: planeFly 25s linear infinite;
-    z-index: 4; /* Above birds */
-    opacity: 0.6;
-}
-.plane:nth-child(2) { animation-delay: 12s; animation-duration: 28s; transform: translateX(-120vw) translateY(var(--plane-y-start, 0)) scaleX(-1); top: 15%;}
 
 .shooting-star {
     position: fixed;
@@ -161,76 +142,72 @@ body {
     box-shadow: 0 0 10px white, 0 0 20px rgba(255, 255, 255, 0.8), 0 0 30px rgba(255, 255, 255, 0.6);
     border-radius: 50%;
     animation: shootingStar 4s linear infinite;
-    z-index: 5; /* Above planes */
-    display: var(--star-display, none); /* Controlled by JS (only at night) */
+    z-index: 5;
+    display: var(--star-display, none);
 }
 .shooting-star:nth-child(2) { animation-delay: 2s; animation-duration: 5s; }
 .shooting-star:nth-child(3) { animation-delay: 6s; animation-duration: 3s; }
 
-/* General particles (stars at night, subtle haze/glow during day) */
 .particle {
     position: fixed;
-    background-color: rgba(255, 255, 255, var(--particle-opacity, 0.8));
+    background-color: rgba(255, 255, 255, var(--particle-opacity, 0.8)); /* Opacity controlled by JS for dimness */
     border-radius: 50%;
-    /* Re-using fadeInScale for subtle twinkle, or shimmer for more effect */
     animation: shimmer 5s ease-out infinite alternate; 
-    pointer-events: none; /* Allows clicks to pass through */
+    pointer-events: none;
     box-shadow: 0 0 5px rgba(255, 255, 255, 0.7);
-    z-index: 5; /* Same as shooting stars */
-    display: var(--particle-display, block); /* Controlled by JS */
+    z-index: 5;
+    display: var(--particle-display, block);
 }
 
 /* --- Main Content Area (Scrollable) --- */
 .content-container {
-    position: relative; /* Allows content to scroll over fixed background */
-    z-index: 10; /* Ensure content is above all background elements */
+    position: relative;
+    z-index: 10;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
     width: 100%;
-    padding: 50px 20px 100px; /* Top, horizontal, bottom padding */
-    min-height: 100vh; /* Ensures content starts from here */
-    box-sizing: border-box; /* Include padding in width/height */
+    padding: 50px 20px 100px;
+    min-height: 100vh;
+    box-sizing: border-box;
 }
 
 .card {
-    background-color: rgba(255, 255, 255, 0.1); /* Semi-transparent white */
+    background-color: rgba(255, 255, 255, 0.05); /* Even more transparent for dimness */
     border-radius: 15px;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2); /* Soft shadow */
-    padding: 25px 30px; /* Increased padding for better look */
-    margin: 20px 0; /* Increased margin between cards */
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+    padding: 25px 30px;
+    margin: 20px 0;
     max-width: 700px;
-    backdrop-filter: blur(8px); /* Frosted glass effect */
-    border: 1px solid rgba(255, 255, 255, 0.2); /* Subtle white border */
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.1); /* Subtler border */
     text-align: center;
-    width: 90%; /* Responsive width */
+    width: 90%;
     box-sizing: border-box;
-    opacity: 0; /* Hidden by default, revealed by JS */
-    transition: opacity 0.6s ease-out; /* Smooth fade-in transition */
+    opacity: 0;
+    transition: opacity 0.6s ease-out;
 }
 
 h1 {
     font-family: 'Pacifico', cursive;
-    font-size: 2.4em; /* Slightly larger heading */
-    margin-bottom: 20px; /* More space below heading */
+    font-size: 2.4em;
+    margin-bottom: 20px;
     text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
-    color: #FFD700; /* Gold color */
+    color: #FFD700;
 }
 
-/* Typewriter text base styling */
 .typewriter-text {
-    white-space: nowrap; /* Keep on one line for typing effect */
-    overflow: hidden; /* Hide overflowing text */
-    border-right: .15em solid orange; /* The blinking caret */
+    white-space: nowrap;
+    overflow: hidden;
+    border-right: .15em solid orange;
     animation: typing 1s steps(20, end) forwards, blinkCaret .75s step-end infinite;
-    display: inline-block; /* Essential for width calculation */
-    max-width: 100%; /* Ensure it doesn't overflow container */
-    vertical-align: top; /* Align nicely with content */
-    font-size: 1em; /* Default size for general text */
-    line-height: 1.5; /* Good readability */
+    display: inline-block;
+    max-width: 100%;
+    vertical-align: top;
+    font-size: 1em;
+    line-height: 1.5;
 }
-/* Override blinkCaret for elements that don't need continuous blinking */
 .typed-once .typewriter-text {
     border-right: none;
     animation: typing 1s steps(20, end) forwards;
@@ -238,20 +215,20 @@ h1 {
 
 #greeting {
     font-family: 'Press Start 2P', cursive;
-    font-size: 1.2em; /* Slightly larger greeting */
+    font-size: 1.2em;
     font-weight: normal;
     margin-bottom: 15px;
     color: #FFD700;
-    animation: pulse 2s infinite ease-in-out; /* Gentle pulse */
+    animation: pulse 2s infinite ease-in-out;
 }
 
 #countdown {
     font-family: 'Press Start 2P', cursive;
-    font-size: 2.8em; /* Larger countdown numbers */
+    font-size: 2.8em;
     font-weight: bold;
     margin-bottom: 25px;
-    letter-spacing: 3px; /* Increased letter spacing */
-    color: #e0ffff; /* Light cyan */
+    letter-spacing: 3px;
+    color: #e0ffff;
     text-shadow: 2px 2px 7px rgba(0, 0, 0, 0.4);
     transition: transform 0.2s ease-out;
 }
@@ -260,24 +237,24 @@ h1 {
     display: inline-block;
     animation: numberBounce 1s ease-out infinite;
     animation-delay: var(--delay);
-    padding: 0 5px; /* More spacing for numbers */
+    padding: 0 5px;
 }
 
 .message-box {
-    border-left: 5px solid #FFC0CB; /* Thicker border */
-    padding: 20px 25px; /* More padding */
-    font-size: 1em; /* Slightly larger font */
-    line-height: 1.7; /* Better line spacing */
+    border-left: 5px solid #FFC0CB;
+    padding: 20px 25px;
+    font-size: 1em;
+    line-height: 1.7;
 }
 
 .emoji {
-    font-size: 1.6em; /* Larger emoji */
+    font-size: 1.6em;
     margin-right: 10px;
     vertical-align: middle;
 }
 
 .question-box {
-    font-size: 0.95em; /* Slightly larger question text */
+    font-size: 0.95em;
     margin-top: 25px;
     padding: 15px 20px;
     border-radius: 10px;
@@ -285,6 +262,6 @@ h1 {
 
 .note {
     margin-top: 35px;
-    font-size: 0.85em; /* Slightly larger note */
+    font-size: 0.85em;
     color: rgba(255, 255, 255, 0.75);
 }
