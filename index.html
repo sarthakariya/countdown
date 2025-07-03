@@ -3,83 +3,370 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Our Special Countdown!</title>
+    <title>Our Special Countdown! 🌊☀️</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
+        /* Keyframe Animations */
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes sunMovement {
+            0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            25% { transform: translate(-40%, -60%) scale(1.05); opacity: 1; }
+            50% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            75% { transform: translate(-60%, -40%) scale(0.95); opacity: 0.8; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+
+        @keyframes wave {
+            0% { transform: translateX(0); }
+            50% { transform: translateX(-1%); }
+            100% { transform: translateX(0); }
+        }
+
+        @keyframes numberPop {
+            0% { transform: translateY(0) scale(1); opacity: 1; }
+            50% { transform: translateY(-5px) scale(1.05); opacity: 0.8; }
+            100% { transform: translateY(0) scale(1); opacity: 1; }
+        }
+
+        @keyframes sparkle {
+            0%, 100% { box-shadow: 0 0 8px rgba(255, 255, 255, 0.7); }
+            50% { box-shadow: 0 0 15px rgba(255, 255, 255, 1); }
+        }
+
+        @keyframes particleFloat {
+            0% { transform: translateY(0) translateX(0); opacity: 0; }
+            25% { opacity: 0.8; }
+            50% { transform: translateY(-20px) translateX(10px); opacity: 0.5; }
+            75% { opacity: 0.3; }
+            100% { transform: translateY(-40px) translateX(-10px); opacity: 0; }
+        }
+
+
+        /* Base Styles */
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: 'Poppins', sans-serif;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            background-color: #f0f8ff; /* Light sky blue */
-            color: #333;
-            text-align: center;
             margin: 0;
             padding: 20px;
             box-sizing: border-box;
+            color: #fff;
+            background: var(--sky-gradient); /* Dynamic sky gradient */
+            overflow: hidden; /* Hide overflow for particles and background elements */
+            position: relative;
+            transition: background 2s ease-in-out; /* Smooth background transition */
         }
-        .countdown-container {
-            background-color: #fff;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            padding: 30px 40px;
-            margin-bottom: 20px;
+
+        /* Sun and Sea Simulation */
+        body::before { /* Sun */
+            content: '';
+            position: absolute;
+            top: var(--sun-top);
+            left: var(--sun-left);
+            width: var(--sun-size);
+            height: var(--sun-size);
+            background: var(--sun-color);
+            border-radius: 50%;
+            filter: blur(var(--sun-blur)); /* Soft glow */
+            animation: sunMovement 15s ease-in-out infinite alternate;
+            z-index: 1;
+            transition: all 2s ease-in-out;
+        }
+
+        body::after { /* Sea */
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: var(--sea-height); /* Dynamic sea height */
+            background: var(--sea-color);
+            border-top-left-radius: 50% 20%;
+            border-top-right-radius: 50% 20%;
+            animation: wave 10s ease-in-out infinite alternate;
+            z-index: 2;
+            transition: all 2s ease-in-out;
+        }
+
+        /* Particle/Twinkle effect */
+        .particle {
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            animation: particleFloat 5s ease-out infinite; /* Floating animation */
+            pointer-events: none;
+            box-shadow: 0 0 5px rgba(255, 255, 255, 0.7);
+            z-index: 5;
+        }
+
+        .container {
+            background-color: rgba(255, 255, 255, 0.15);
+            border-radius: 25px; /* More rounded */
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3); /* Stronger shadow */
+            padding: 45px 55px;
+            margin-bottom: 30px;
             max-width: 90%;
+            backdrop-filter: blur(12px); /* More blur */
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            animation: fadeInScale 1s ease-out;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+            overflow: hidden; /* Ensure content stays within blur */
         }
+
         h1 {
-            color: #ff69b4; /* Hot pink */
-            font-size: 2.5em;
-            margin-bottom: 15px;
-        }
-        #countdown {
+            font-family: 'Pacifico', cursive; /* Whimsical title font */
             font-size: 3.5em;
-            font-weight: bold;
-            color: #4682b4; /* Steel blue */
             margin-bottom: 20px;
-            letter-spacing: 2px;
+            text-shadow: 3px 3px 7px rgba(0, 0, 0, 0.4);
+            color: #FFD700; /* Gold */
         }
+
+        #greeting {
+            font-size: 2em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #FFD700;
+            animation: pulse 2s infinite ease-in-out;
+        }
+
+        #countdown {
+            font-size: 5em; /* Larger countdown */
+            font-weight: bold;
+            margin-bottom: 30px;
+            letter-spacing: 4px;
+            color: #e0ffff;
+            text-shadow: 4px 4px 10px rgba(0, 0, 0, 0.5);
+            animation: fadeInScale 1.2s ease-out;
+            transition: transform 0.3s ease-out;
+        }
+
+        #countdown:hover {
+            transform: scale(1.05); /* More pronounced hover */
+        }
+
+        #countdown .number {
+            display: inline-block; /* Allows individual animation */
+            animation: numberPop 1.5s ease-out infinite alternate; /* Pop animation */
+            animation-delay: var(--delay); /* Staggered delay */
+        }
+
         .message-box {
-            background-color: #e0ffff; /* Light cyan */
-            border-left: 5px solid #ff69b4;
-            padding: 15px 20px;
-            border-radius: 8px;
-            margin-top: 20px;
-            font-size: 1.1em;
-            line-height: 1.6;
-            color: #555;
-            max-width: 90%;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-left: 6px solid #FFC0CB;
+            padding: 22px 28px;
+            border-radius: 15px;
+            margin-top: 25px;
+            font-size: 1.3em;
+            line-height: 1.8;
+            color: #F0F8FF;
+            max-width: 80%;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+            animation: fadeInScale 1.5s ease-out;
+            position: relative;
+            z-index: 10;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
         }
+
         .emoji {
-            font-size: 1.5em;
-            margin-right: 8px;
+            font-size: 2em; /* Larger emojis */
+            margin-right: 12px;
+            vertical-align: middle;
         }
-        .note {
+
+        .question-box {
+            font-size: 1.4em;
             margin-top: 30px;
-            font-size: 0.9em;
-            color: #777;
+            padding: 18px 25px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            border: 1px dashed rgba(255, 255, 255, 0.5);
+            color: #FFFAFA;
+            font-style: italic;
+            position: relative;
+            z-index: 10;
+            animation: fadeInScale 1.8s ease-out;
+            box-shadow: 0 3px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .note {
+            margin-top: 40px;
+            font-size: 1.1em;
+            color: rgba(255, 255, 255, 0.9);
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 10;
         }
     </style>
 </head>
 <body>
 
-    <div class="countdown-container">
-        <h1>When We'll Meet Again!</h1>
+    <div class="container">
+        <div id="greeting"></div>
+        <h1>Our Next Meeting! ✨</h1>
         <div id="countdown"></div>
     </div>
 
     <div class="message-box">
-        <p><span class="emoji">💖</span> Remember, every moment apart builds anticipation for the next shared smile. Keep shining!</p>
-        <p><span class="emoji">🌟</span> Have a wonderful day, and look forward to what tomorrow brings!</p>
+        <p><span class="emoji">💫</span> Always remember, the best is yet to come, and every day brings us closer!</p>
+        <p><span class="emoji">💖</span> You've got this, Sarthak! Make today amazing.</p>
     </div>
 
-    <p class="note">Time is set for 11:30 AM IST on July 4th, 2025.</p>
+    <div class="question-box" id="dailyQuestion"></div>
+
+    <p class="note">Counting down to school starting at 11:30 AM IST tomorrow, July 4th, 2025.</p>
 
     <script>
-        // Set the date and time for tomorrow at 11:30 AM IST (Kolkata time)
-        // Note: Months are 0-indexed in JavaScript (January is 0, December is 11)
-        const targetDate = new Date("July 4, 2025 11:30:00 GMT+0530"); // GMT+0530 is IST
+        // --- Google Fonts Loading (Optional, but good practice) ---
+        // This is already handled by the <link> tag in HTML, but if you were dynamically adding fonts,
+        // you might use something like Web Font Loader. For now, the link tag is sufficient.
 
+        // --- Particle background effect ---
+        function createParticles() {
+            const body = document.body;
+            for (let i = 0; i < 70; i++) { // Even more particles for a 'laggy' feel
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                const size = Math.random() * 6 + 3; // Size from 3px to 9px
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.left = `${Math.random() * 100}vw`;
+                particle.style.top = `${Math.random() * 100}vh`;
+                particle.style.animationDelay = `${Math.random() * 4}s`; // Stagger animation more
+                particle.style.animationDuration = `${Math.random() * 6 + 4}s`; // Varied duration
+                body.appendChild(particle);
+            }
+        }
+        createParticles();
+
+        // --- Dynamic Background (Sky, Sun, Sea) based on Time ---
+        function setDynamicBackground() {
+            const now = new Date();
+            const hour = now.getHours();
+            let skyGradient, sunColor, sunSize, sunBlur, sunTop, sunLeft, seaColor, seaHeight;
+
+            if (hour >= 5 && hour < 7) { // Early Morning / Sunrise (5 AM - 6:59 AM)
+                skyGradient = 'linear-gradient(135deg, #FFDAB9, #FFB6C1, #87CEEB)'; // Peach, LightPink, SkyBlue
+                sunColor = '#FF8C00'; // DarkOrange
+                sunSize = '100px';
+                sunBlur = '30px';
+                sunTop = '20%';
+                sunLeft = '20%';
+                seaColor = '#4682B4'; // SteelBlue
+                seaHeight = '30%';
+            } else if (hour >= 7 && hour < 12) { // Morning / Day (7 AM - 11:59 AM)
+                skyGradient = 'linear-gradient(135deg, #87CEEB, #ADD8E6, #B0E0E6)'; // SkyBlue, LightBlue, PowderBlue
+                sunColor = '#FFD700'; // Gold
+                sunSize = '120px';
+                sunBlur = '40px';
+                sunTop = '15%';
+                sunLeft = '50%';
+                seaColor = '#1E90FF'; // DodgerBlue
+                seaHeight = '35%';
+            } else if (hour >= 12 && hour < 17) { // Afternoon (12 PM - 4:59 PM)
+                skyGradient = 'linear-gradient(135deg, #6A5ACD, #483D8B, #191970)'; // SlateBlue, DarkSlateBlue, MidnightBlue
+                sunColor = '#FFA500'; // Orange
+                sunSize = '110px';
+                sunBlur = '35px';
+                sunTop = '25%';
+                sunLeft = '80%';
+                seaColor = '#000080'; // Navy
+                seaHeight = '40%';
+            } else if (hour >= 17 && hour < 19) { // Sunset (5 PM - 6:59 PM)
+                skyGradient = 'linear-gradient(135deg, #FF6347, #FF4500, #8B0000)'; // Tomato, OrangeRed, DarkRed
+                sunColor = '#FFD700'; // Gold
+                sunSize = '130px';
+                sunBlur = '50px';
+                sunTop = '40%';
+                sunLeft = '50%';
+                seaColor = '#4169E1'; // RoyalBlue
+                seaHeight = '45%';
+            } else { // Night (7 PM - 4:59 AM)
+                skyGradient = 'linear-gradient(135deg, #000033, #000066, #191970)'; // Darker blues for night
+                sunColor = 'transparent'; // Sun is hidden at night
+                sunSize = '0px';
+                sunBlur = '0px';
+                sunTop = '50%';
+                sunLeft = '50%';
+                seaColor = '#000033'; // Very dark blue for night sea
+                seaHeight = '50%';
+            }
+
+            document.documentElement.style.setProperty('--sky-gradient', skyGradient);
+            document.documentElement.style.setProperty('--sun-color', sunColor);
+            document.documentElement.style.setProperty('--sun-size', sunSize);
+            document.documentElement.style.setProperty('--sun-blur', sunBlur);
+            document.documentElement.style.setProperty('--sun-top', sunTop);
+            document.documentElement.style.setProperty('--sun-left', sunLeft);
+            document.documentElement.style.setProperty('--sea-color', seaColor);
+            document.documentElement.style.setProperty('--sea-height', seaHeight);
+        }
+        setDynamicBackground(); // Set on load
+        setInterval(setDynamicBackground, 60 * 60 * 1000); // Update every hour
+
+        // --- Greeting for Reechita ---
+        function updateGreeting() {
+            const now = new Date();
+            const hour = now.getHours();
+            let greetingText;
+
+            if (hour >= 5 && hour < 12) {
+                greetingText = "Good Morning, Reechita! ☀️";
+            } else if (hour >= 12 && hour < 18) {
+                greetingText = "Good Afternoon, Reechita! 🌤️";
+            } else {
+                greetingText = "Good Evening, Reechita! 🌙";
+            }
+            document.getElementById('greeting').textContent = greetingText;
+        }
+        updateGreeting(); // Set greeting on load
+
+        // --- Rotating Questions ---
+        const questions = [
+            "What's one thing you're looking forward to today?",
+            "If you could have any superpower, what would it be?",
+            "What's your favorite memory with her so far?",
+            "What's a small act of kindness you can do today?",
+            "What's your go-to song when you need a boost?",
+            "What's something new you want to learn?",
+            "If you could travel anywhere, where would you go?",
+            "What makes you smile the most?",
+            "What's your favorite thing about being in school?",
+            "What's a dream you have for the future?",
+            "What's one thing you appreciate about her?",
+            "If you could spend a day doing anything, what would it be?",
+            "What's your favorite subject in school?",
+            "What's a funny memory you have?",
+            "What's a goal you're working towards right now?",
+            "What's your favorite way to relax?",
+            "If you could give one piece of advice to your past self, what would it be?",
+            "What's your favorite season and why?",
+            "What's a book or movie that has inspired you?",
+            "What's something you're grateful for today?"
+        ];
+
+        function displayRandomQuestion() {
+            const randomIndex = Math.floor(Math.random() * questions.length);
+            document.getElementById('dailyQuestion').textContent = questions[randomIndex];
+        }
+        displayRandomQuestion(); // Display a question on load
+
+        // --- Countdown Timer Logic ---
+        const targetDate = new Date("July 4, 2025 11:30:00 GMT+0530"); // Target: July 4th, 2025 11:30 AM IST
         const countdownElement = document.getElementById('countdown');
 
         function updateCountdown() {
@@ -92,15 +379,16 @@
             const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-            // Display the result
             if (distance < 0) {
                 countdownElement.innerHTML = "It's time! School has started! 🎉";
                 clearInterval(countdownInterval); // Stop the countdown
             } else {
+                // Generate a unique delay for each number span for staggered animation
                 countdownElement.innerHTML =
-                    `${days > 0 ? days + "d " : ""}${hours < 10 ? "0" + hours : hours}h ` +
-                    `${minutes < 10 ? "0" + minutes : minutes}m ` +
-                    `${seconds < 10 ? "0" + seconds : seconds}s`;
+                    `<span class="number" style="--delay: 0s;">${days > 0 ? days + "d " : ""}</span>` +
+                    `<span class="number" style="--delay: 0.1s;">${hours < 10 ? "0" + hours : hours}h </span>` +
+                    `<span class="number" style="--delay: 0.2s;">${minutes < 10 ? "0" + minutes : minutes}m </span>` +
+                    `<span class="number" style="--delay: 0.3s;">${seconds < 10 ? "0" + seconds : seconds}s</span>`;
             }
         }
 
