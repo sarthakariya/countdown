@@ -1,38 +1,32 @@
 /* --- Keyframe Animations --- */
-/* For smooth reveal and gentle pop-in for cards and now text elements */
 @keyframes fadeInScale {
     from { opacity: 0; transform: scale(0.9); }
     to { opacity: 1; transform: scale(1); }
 }
 
-/* Subtle pulsing effect for the greeting */
 @keyframes pulse {
     0% { transform: scale(1); }
     50% { transform: scale(1.02); }
     100% { transform: scale(1); }
 }
 
-/* Sun/Moon gentle bobbing movement */
 @keyframes sunMoonMovement {
     0% { transform: translate(-50%, -50%) scale(1); }
     50% { transform: translate(-50%, -52%) scale(1.01); }
     100% { transform: translate(-50%, -50%) scale(1); }
 }
 
-/* Water gentle movement */
 @keyframes waterMovement {
     0% { background-position: 0% 0%; }
     100% { background-position: 100% 0%; }
 }
 
-/* Shooting star animation for night */
 @keyframes shootingStar {
     0% { transform: translate(100vw, -100vh) rotate(45deg); opacity: 0; }
     5% { opacity: 1; }
     100% { transform: translate(-100vw, 100vh) rotate(45deg); opacity: 0; }
 }
 
-/* Slight bounce for countdown numbers */
 @keyframes numberBounce {
     0%, 100% { transform: translateY(0); }
     25% { transform: translateY(-3px); }
@@ -40,7 +34,6 @@
     75% { transform: translateY(-1px); }
 }
 
-/* Shimmer/Twinkle for particles (stars or haze) */
 @keyframes shimmer {
     0%, 100% { opacity: var(--particle-opacity, 0.8); transform: scale(1); }
     50% { opacity: calc(var(--particle-opacity, 0.8) * 0.5); transform: scale(1.1); }
@@ -154,6 +147,39 @@ body {
     box-sizing: border-box;
 }
 
+/* --- Greeting Text (Standalone, without a box) --- */
+#greeting {
+    font-family: 'Pacifico', cursive; /* A nice, friendly font */
+    font-size: 3em; /* Larger and more prominent */
+    font-weight: normal;
+    margin-bottom: 20px; /* Space below it */
+    color: #FFD700; /* Gold color */
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.4); /* Stronger shadow for pop */
+    text-align: center;
+    padding: 0 20px; /* Some padding to prevent text touching edges on small screens */
+    opacity: 0; /* Hidden by default, animated by JS */
+    transform: scale(0.9); /* Starts smaller */
+    animation: pulse 2s infinite ease-in-out; /* Keep the pulse animation */
+    /* text-reveal-animation-standalone will apply the fadeInScale */
+}
+
+/* Base style for elements that will reveal with fade and scale */
+.text-reveal-animation {
+    display: inline-block; /* Essential for transform to work correctly */
+    opacity: 0; /* Hidden by default, JS will apply animation */
+    transform: scale(0.9); /* Slightly scaled down by default */
+    /* animation properties will be set by JS for staggered effect */
+    white-space: normal; /* Allow text to wrap naturally */
+}
+
+/* Specific style for standalone elements that use text-reveal-animation */
+.text-reveal-animation-standalone {
+    opacity: 0;
+    transform: scale(0.9);
+    /* animation will be set directly by JS, no shared class for stagger */
+}
+
+
 .card {
     background-color: rgba(255, 255, 255, 0.05); /* Even more transparent for dimness */
     border-radius: 15px;
@@ -177,35 +203,6 @@ h1 {
     text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
     color: #FFD700;
 }
-
-/* New: Styles for text elements that will fade in/scale up */
-.text-reveal-animation {
-    display: inline-block; /* Essential for transform to work correctly */
-    opacity: 0; /* Hidden by default, JS will apply animation */
-    transform: scale(0.9); /* Slightly scaled down by default */
-    /* animation properties will be set by JS */
-    font-size: 1em; /* Default size */
-    line-height: 1.5;
-    white-space: normal; /* Allow text to wrap naturally now */
-}
-
-#greeting .text-reveal-animation {
-    font-family: 'Press Start 2P', cursive;
-    font-size: 1.2em;
-    font-weight: normal;
-    color: #FFD700;
-}
-
-#dailyQuestion.text-reveal-animation {
-    font-size: 0.95em;
-}
-
-/* No specific typewriter-text-h1 class, will use text-reveal-animation */
-.card h1.text-reveal-animation {
-    /* H1's own font and size are defined above, just ensuring it gets the animation */
-    display: block; /* H1 should be block level */
-}
-
 
 #countdown {
     font-family: 'Press Start 2P', cursive;
