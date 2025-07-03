@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Our Special Countdown! 🌊☀️</title>
-    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <title>Our Special Countdown! 🌌🚀</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Press+Start+2P&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
         /* Keyframe Animations */
         @keyframes fadeInScale {
@@ -18,322 +19,402 @@
             100% { transform: scale(1); }
         }
 
-        @keyframes sunMovement {
-            0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-            25% { transform: translate(-40%, -60%) scale(1.05); opacity: 1; }
-            50% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-            75% { transform: translate(-60%, -40%) scale(0.95); opacity: 0.8; }
-            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        @keyframes sunMoonMovement {
+            0% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -60%) scale(1.05); }
+            100% { transform: translate(-50%, -50%) scale(1); }
         }
 
-        @keyframes wave {
-            0% { transform: translateX(0); }
-            50% { transform: translateX(-1%); }
-            100% { transform: translateX(0); }
+        @keyframes birdFly {
+            0% { transform: translateX(-100vw) translateY(0); }
+            100% { transform: translateX(100vw) translateY(50px); }
         }
 
-        @keyframes numberPop {
-            0% { transform: translateY(0) scale(1); opacity: 1; }
-            50% { transform: translateY(-5px) scale(1.05); opacity: 0.8; }
-            100% { transform: translateY(0) scale(1); opacity: 1; }
+        @keyframes planeFly {
+            0% { transform: translateX(-120vw) translateY(0) scale(0.8); }
+            100% { transform: translateX(100vw) translateY(-50px) scale(0.8); }
         }
 
-        @keyframes sparkle {
-            0%, 100% { box-shadow: 0 0 8px rgba(255, 255, 255, 0.7); }
-            50% { box-shadow: 0 0 15px rgba(255, 255, 255, 1); }
+        @keyframes shootingStar {
+            0% { transform: translate(100vw, -100vh) rotate(45deg); opacity: 0; }
+            5% { opacity: 1; }
+            100% { transform: translate(-100vw, 100vh) rotate(45deg); opacity: 0; }
         }
 
-        @keyframes particleFloat {
-            0% { transform: translateY(0) translateX(0); opacity: 0; }
-            25% { opacity: 0.8; }
-            50% { transform: translateY(-20px) translateX(10px); opacity: 0.5; }
-            75% { opacity: 0.3; }
-            100% { transform: translateY(-40px) translateX(-10px); opacity: 0; }
+        @keyframes waterMovement {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 100% 0%; }
+        }
+        
+        @keyframes blinkCaret {
+            50% { border-color: transparent; }
+        }
+        
+        @keyframes typing {
+            from { width: 0; }
+            to { width: 100%; }
         }
 
+        @keyframes numberBounce {
+            0%, 100% { transform: translateY(0); }
+            25% { transform: translateY(-5px); }
+            50% { transform: translateY(0); }
+            75% { transform: translateY(-2px); }
+        }
 
         /* Base Styles */
+        html {
+            scroll-behavior: smooth;
+        }
+
         body {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Roboto Mono', monospace; /* Typewriter-like font */
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            justify-content: flex-start; /* Align content to top for scrolling */
             align-items: center;
-            min-height: 100vh;
+            min-height: 200vh; /* Make it scrollable */
             margin: 0;
             padding: 20px;
             box-sizing: border-box;
             color: #fff;
             background: var(--sky-gradient); /* Dynamic sky gradient */
-            overflow: hidden; /* Hide overflow for particles and background elements */
+            overflow-x: hidden; /* Prevent horizontal scroll */
             position: relative;
-            transition: background 2s ease-in-out; /* Smooth background transition */
+            transition: background 2s ease-in-out;
         }
 
-        /* Sun and Sea Simulation */
-        body::before { /* Sun */
-            content: '';
-            position: absolute;
-            top: var(--sun-top);
-            left: var(--sun-left);
-            width: var(--sun-size);
-            height: var(--sun-size);
-            background: var(--sun-color);
-            border-radius: 50%;
-            filter: blur(var(--sun-blur)); /* Soft glow */
-            animation: sunMovement 15s ease-in-out infinite alternate;
-            z-index: 1;
-            transition: all 2s ease-in-out;
+        /* Dynamic Background Elements */
+        .sky-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: var(--sky-height); /* Dynamic sky height */
+            background: var(--sky-gradient);
+            transition: background 2s ease-in-out, height 2s ease-in-out;
+            z-index: 0;
         }
 
-        body::after { /* Sea */
-            content: '';
-            position: absolute;
+        .sea-bg {
+            position: fixed;
             bottom: 0;
             left: 0;
             width: 100%;
             height: var(--sea-height); /* Dynamic sea height */
-            background: var(--sea-color);
-            border-top-left-radius: 50% 20%;
-            border-top-right-radius: 50% 20%;
-            animation: wave 10s ease-in-out infinite alternate;
+            background: var(--sea-gradient);
+            background-size: 200% 100%; /* For wave animation */
+            animation: waterMovement 30s linear infinite;
+            border-top-left-radius: 50% 10%; /* Gentle wave shape */
+            border-top-right-radius: 50% 10%;
+            transition: background 2s ease-in-out, height 2s ease-in-out;
+            z-index: 1;
+        }
+
+        .sun-moon {
+            position: fixed;
+            width: var(--celestial-size);
+            height: var(--celestial-size);
+            background: var(--celestial-color);
+            border-radius: 50%;
+            filter: blur(var(--celestial-blur));
+            top: var(--celestial-top);
+            left: var(--celestial-left);
+            animation: sunMoonMovement 20s ease-in-out infinite alternate;
             z-index: 2;
             transition: all 2s ease-in-out;
         }
 
-        /* Particle/Twinkle effect */
-        .particle {
-            position: absolute;
-            background-color: rgba(255, 255, 255, 0.8);
+        .bird {
+            position: fixed;
+            font-size: 2em;
+            color: #333;
+            animation: birdFly 15s linear infinite;
+            z-index: 3;
+            opacity: 0.8;
+        }
+        .bird:nth-child(2) { animation-delay: 5s; animation-duration: 18s; transform: scaleX(-1); left: 100vw;}
+        .bird:nth-child(3) { animation-delay: 10s; animation-duration: 12s; top: 20%; }
+
+        .plane {
+            position: fixed;
+            font-size: 2.5em;
+            color: #ccc;
+            animation: planeFly 25s linear infinite;
+            z-index: 4;
+            opacity: 0.6;
+        }
+        .plane:nth-child(2) { animation-delay: 12s; animation-duration: 28s; transform: scaleX(-1); left: 100vw; top: 15%;}
+
+        .shooting-star {
+            position: fixed;
+            width: 5px;
+            height: 5px;
+            background: white;
+            box-shadow: 0 0 10px white, 0 0 20px rgba(255, 255, 255, 0.8), 0 0 30px rgba(255, 255, 255, 0.6);
             border-radius: 50%;
-            animation: particleFloat 5s ease-out infinite; /* Floating animation */
-            pointer-events: none;
-            box-shadow: 0 0 5px rgba(255, 255, 255, 0.7);
+            animation: shootingStar 4s linear infinite;
             z-index: 5;
+            display: var(--star-display, none); /* Hide during day */
+        }
+        .shooting-star:nth-child(2) { animation-delay: 2s; animation-duration: 5s; }
+        .shooting-star:nth-child(3) { animation-delay: 6s; animation-duration: 3s; }
+
+        /* Content Container */
+        .content-container {
+            position: relative; /* Allows content to scroll over background */
+            z-index: 10; /* Ensure content is above background elements */
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            width: 100%;
+            padding-top: 50px; /* Space from top edge */
+            padding-bottom: 100px; /* Space for scrolling */
+            min-height: 100vh; /* Ensure content starts from here */
         }
 
-        .container {
-            background-color: rgba(255, 255, 255, 0.15);
-            border-radius: 25px; /* More rounded */
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3); /* Stronger shadow */
-            padding: 45px 55px;
-            margin-bottom: 30px;
-            max-width: 90%;
-            backdrop-filter: blur(12px); /* More blur */
-            border: 1px solid rgba(255, 255, 255, 0.4);
+        .card {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            padding: 20px 25px;
+            margin: 15px 0; /* Smaller margins */
+            max-width: 700px; /* Max width for readability */
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             animation: fadeInScale 1s ease-out;
             text-align: center;
-            position: relative;
-            z-index: 10;
-            overflow: hidden; /* Ensure content stays within blur */
+            width: 90%; /* Responsive width */
+            box-sizing: border-box;
         }
 
         h1 {
-            font-family: 'Pacifico', cursive; /* Whimsical title font */
-            font-size: 3.5em;
-            margin-bottom: 20px;
-            text-shadow: 3px 3px 7px rgba(0, 0, 0, 0.4);
-            color: #FFD700; /* Gold */
+            font-family: 'Pacifico', cursive;
+            font-size: 2.2em; /* Smaller title */
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+            color: #FFD700;
         }
 
         #greeting {
-            font-size: 2em;
-            font-weight: 600;
-            margin-bottom: 15px;
+            font-family: 'Press Start 2P', cursive; /* Retro pixel font for greeting */
+            font-size: 1.1em; /* Smaller greeting */
+            font-weight: normal;
+            margin-bottom: 10px;
             color: #FFD700;
             animation: pulse 2s infinite ease-in-out;
+            white-space: nowrap; /* Keep on one line */
+            overflow: hidden; /* Hide overflow for typing effect */
+            border-right: .15em solid orange; /* The caret */
+            animation: typing 1s steps(20, end), blinkCaret .75s step-end infinite;
         }
 
         #countdown {
-            font-size: 5em; /* Larger countdown */
+            font-family: 'Press Start 2P', cursive; /* Retro pixel font for countdown */
+            font-size: 2.5em; /* Smaller countdown */
             font-weight: bold;
-            margin-bottom: 30px;
-            letter-spacing: 4px;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
             color: #e0ffff;
-            text-shadow: 4px 4px 10px rgba(0, 0, 0, 0.5);
+            text-shadow: 2px 2px 7px rgba(0, 0, 0, 0.4);
             animation: fadeInScale 1.2s ease-out;
-            transition: transform 0.3s ease-out;
-        }
-
-        #countdown:hover {
-            transform: scale(1.05); /* More pronounced hover */
+            transition: transform 0.2s ease-out;
         }
 
         #countdown .number {
-            display: inline-block; /* Allows individual animation */
-            animation: numberPop 1.5s ease-out infinite alternate; /* Pop animation */
-            animation-delay: var(--delay); /* Staggered delay */
+            display: inline-block;
+            animation: numberBounce 1s ease-out infinite; /* Bounce animation */
+            animation-delay: var(--delay);
+            padding: 0 3px; /* Small padding for spacing */
         }
 
         .message-box {
-            background-color: rgba(255, 255, 255, 0.1);
-            border-left: 6px solid #FFC0CB;
-            padding: 22px 28px;
-            border-radius: 15px;
-            margin-top: 25px;
-            font-size: 1.3em;
-            line-height: 1.8;
-            color: #F0F8FF;
-            max-width: 80%;
-            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
-            animation: fadeInScale 1.5s ease-out;
-            position: relative;
-            z-index: 10;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            border-left: 4px solid #FFC0CB; /* Smaller border */
+            padding: 15px 20px; /* Smaller padding */
+            font-size: 0.95em; /* Smaller text */
+            line-height: 1.6;
         }
 
         .emoji {
-            font-size: 2em; /* Larger emojis */
-            margin-right: 12px;
+            font-size: 1.5em; /* Smaller emojis */
+            margin-right: 8px;
             vertical-align: middle;
         }
 
         .question-box {
-            font-size: 1.4em;
-            margin-top: 30px;
-            padding: 18px 25px;
-            background-color: rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            border: 1px dashed rgba(255, 255, 255, 0.5);
-            color: #FFFAFA;
-            font-style: italic;
-            position: relative;
-            z-index: 10;
-            animation: fadeInScale 1.8s ease-out;
-            box-shadow: 0 3px 15px rgba(0, 0, 0, 0.15);
+            font-size: 0.9em; /* Smaller text */
+            margin-top: 20px;
+            padding: 12px 18px;
+            border-radius: 8px;
         }
 
         .note {
-            margin-top: 40px;
-            font-size: 1.1em;
-            color: rgba(255, 255, 255, 0.9);
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
-            position: relative;
-            z-index: 10;
+            margin-top: 30px;
+            font-size: 0.8em; /* Smaller text */
+            color: rgba(255, 255, 255, 0.7);
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <div id="greeting"></div>
-        <h1>Our Next Meeting! ✨</h1>
-        <div id="countdown"></div>
+    <div class="sky-bg"></div>
+    <div class="sea-bg"></div>
+    <div class="sun-moon"></div>
+
+    <span class="bird">🐦</span>
+    <span class="bird">🐦</span>
+    <span class="bird">🐦</span>
+    <span class="plane">✈️</span>
+    <span class="plane">✈️</span>
+
+    <div class="shooting-star"></div>
+    <div class="shooting-star"></div>
+    <div class="shooting-star"></div>
+
+    <div class="content-container">
+        <div class="card">
+            <div id="greeting"></div>
+            <h1>Our Next Meeting! ✨</h1>
+            <div id="countdown"></div>
+        </div>
+
+        <div class="card message-box">
+            <p><span class="emoji">💫</span> Always remember, the best is yet to come, and every day brings us closer!</p>
+            <p><span class="emoji">💖</span> You've got this, Sarthak! Make today amazing.</p>
+        </div>
+
+        <div class="card question-box" id="dailyQuestion"></div>
+
+        <div class="card note">
+            <p>Counting down to school starting at 11:30 AM IST tomorrow, July 4th, 2025.</p>
+            <p style="font-size: 0.7em; margin-top: 10px;">(Scroll down for more amazingness!) 🎉</p>
+        </div>
+
+        <div class="card" style="margin-top: 100px; padding: 30px; font-size: 1.1em;">
+            <p>Hey Sarthak! Hope you're doing great. This is a space for all those little things that make your day brighter.</p>
+            <p>Think about a happy memory, or a fun plan you have. Keep shining!</p>
+            <p style="font-size: 0.8em; margin-top: 15px;">"The greatest glory in living lies not in never falling, but in rising every time we fall." - Nelson Mandela</p>
+        </div>
+         <div class="card" style="margin-top: 50px; padding: 30px; font-size: 1.1em;">
+            <p>And remember, Mammam sends her love! ❤️</p>
+            <p>She always says, "Every day is a new adventure, embrace it!"</p>
+        </div>
     </div>
-
-    <div class="message-box">
-        <p><span class="emoji">💫</span> Always remember, the best is yet to come, and every day brings us closer!</p>
-        <p><span class="emoji">💖</span> You've got this, Sarthak! Make today amazing.</p>
-    </div>
-
-    <div class="question-box" id="dailyQuestion"></div>
-
-    <p class="note">Counting down to school starting at 11:30 AM IST tomorrow, July 4th, 2025.</p>
 
     <script>
-        // --- Google Fonts Loading (Optional, but good practice) ---
-        // This is already handled by the <link> tag in HTML, but if you were dynamically adding fonts,
-        // you might use something like Web Font Loader. For now, the link tag is sufficient.
-
-        // --- Particle background effect ---
-        function createParticles() {
+        // --- Particle background effect (using existing particles, could add more for night stars) ---
+        function createParticles(count, minSize, maxSize, animationDuration, animationDelay) {
             const body = document.body;
-            for (let i = 0; i < 70; i++) { // Even more particles for a 'laggy' feel
+            for (let i = 0; i < count; i++) {
                 const particle = document.createElement('div');
                 particle.classList.add('particle');
-                const size = Math.random() * 6 + 3; // Size from 3px to 9px
+                const size = Math.random() * (maxSize - minSize) + minSize;
                 particle.style.width = `${size}px`;
                 particle.style.height = `${size}px`;
                 particle.style.left = `${Math.random() * 100}vw`;
                 particle.style.top = `${Math.random() * 100}vh`;
-                particle.style.animationDelay = `${Math.random() * 4}s`; // Stagger animation more
-                particle.style.animationDuration = `${Math.random() * 6 + 4}s`; // Varied duration
+                particle.style.animationDelay = `${Math.random() * animationDelay}s`;
+                particle.style.animationDuration = `${Math.random() * animationDuration + 5}s`;
                 body.appendChild(particle);
             }
         }
-        createParticles();
+        createParticles(100, 1, 3, 5, 5); // Many small particles for general ambient effect
 
-        // --- Dynamic Background (Sky, Sun, Sea) based on Time ---
-        function setDynamicBackground() {
+        // --- Dynamic Background (Sky, Sea, Sun/Moon, and Animated Elements) ---
+        function setDynamicBackgroundAndElements() {
             const now = new Date();
             const hour = now.getHours();
-            let skyGradient, sunColor, sunSize, sunBlur, sunTop, sunLeft, seaColor, seaHeight;
+            let skyGradient, seaGradient, celestialColor, celestialSize, celestialBlur, celestialTop, celestialLeft;
+            let birdDisplay = 'block', planeDisplay = 'block', starDisplay = 'none';
+            let skyHeight = '70%', seaHeight = '30%'; // Default heights
 
             if (hour >= 5 && hour < 7) { // Early Morning / Sunrise (5 AM - 6:59 AM)
-                skyGradient = 'linear-gradient(135deg, #FFDAB9, #FFB6C1, #87CEEB)'; // Peach, LightPink, SkyBlue
-                sunColor = '#FF8C00'; // DarkOrange
-                sunSize = '100px';
-                sunBlur = '30px';
-                sunTop = '20%';
-                sunLeft = '20%';
-                seaColor = '#4682B4'; // SteelBlue
-                seaHeight = '30%';
+                skyGradient = 'linear-gradient(to bottom, #FFDAB9, #FFB6C1, #87CEEB)'; // Peach, LightPink, SkyBlue
+                seaGradient = 'linear-gradient(to right, #4682B4, #6495ED)'; // SteelBlue, CornflowerBlue
+                celestialColor = '#FF8C00'; // DarkOrange (Sun)
+                celestialSize = '80px';
+                celestialBlur = '25px';
+                celestialTop = '25%';
+                celestialLeft = '20%';
             } else if (hour >= 7 && hour < 12) { // Morning / Day (7 AM - 11:59 AM)
-                skyGradient = 'linear-gradient(135deg, #87CEEB, #ADD8E6, #B0E0E6)'; // SkyBlue, LightBlue, PowderBlue
-                sunColor = '#FFD700'; // Gold
-                sunSize = '120px';
-                sunBlur = '40px';
-                sunTop = '15%';
-                sunLeft = '50%';
-                seaColor = '#1E90FF'; // DodgerBlue
-                seaHeight = '35%';
+                skyGradient = 'linear-gradient(to bottom, #87CEEB, #ADD8E6, #B0E0E6)'; // SkyBlue, LightBlue, PowderBlue
+                seaGradient = 'linear-gradient(to right, #1E90FF, #4169E1)'; // DodgerBlue, RoyalBlue
+                celestialColor = '#FFD700'; // Gold (Sun)
+                celestialSize = '90px';
+                celestialBlur = '30px';
+                celestialTop = '15%';
+                celestialLeft = '50%';
             } else if (hour >= 12 && hour < 17) { // Afternoon (12 PM - 4:59 PM)
-                skyGradient = 'linear-gradient(135deg, #6A5ACD, #483D8B, #191970)'; // SlateBlue, DarkSlateBlue, MidnightBlue
-                sunColor = '#FFA500'; // Orange
-                sunSize = '110px';
-                sunBlur = '35px';
-                sunTop = '25%';
-                sunLeft = '80%';
-                seaColor = '#000080'; // Navy
-                seaHeight = '40%';
+                skyGradient = 'linear-gradient(to bottom, #6A5ACD, #483D8B, #191970)'; // SlateBlue, DarkSlateBlue, MidnightBlue
+                seaGradient = 'linear-gradient(to right, #000080, #191970)'; // Navy, MidnightBlue
+                celestialColor = '#FFA500'; // Orange (Sun)
+                celestialSize = '85px';
+                celestialBlur = '28px';
+                celestialTop = '20%';
+                celestialLeft = '80%';
             } else if (hour >= 17 && hour < 19) { // Sunset (5 PM - 6:59 PM)
-                skyGradient = 'linear-gradient(135deg, #FF6347, #FF4500, #8B0000)'; // Tomato, OrangeRed, DarkRed
-                sunColor = '#FFD700'; // Gold
-                sunSize = '130px';
-                sunBlur = '50px';
-                sunTop = '40%';
-                sunLeft = '50%';
-                seaColor = '#4169E1'; // RoyalBlue
-                seaHeight = '45%';
+                skyGradient = 'linear-gradient(to bottom, #FF6347, #FF4500, #8B0000)'; // Tomato, OrangeRed, DarkRed
+                seaGradient = 'linear-gradient(to right, #4169E1, #6A5ACD)'; // RoyalBlue, SlateBlue
+                celestialColor = '#FFD700'; // Gold (Sun)
+                celestialSize = '100px';
+                celestialBlur = '40px';
+                celestialTop = '40%';
+                celestialLeft = '50%';
             } else { // Night (7 PM - 4:59 AM)
-                skyGradient = 'linear-gradient(135deg, #000033, #000066, #191970)'; // Darker blues for night
-                sunColor = 'transparent'; // Sun is hidden at night
-                sunSize = '0px';
-                sunBlur = '0px';
-                sunTop = '50%';
-                sunLeft = '50%';
-                seaColor = '#000033'; // Very dark blue for night sea
-                seaHeight = '50%';
+                skyGradient = 'linear-gradient(to bottom, #000033, #000066, #191970)'; // Darker blues for night
+                seaGradient = 'linear-gradient(to right, #000033, #000066)'; // Very dark blue for night sea
+                celestialColor = '#E0E0E0'; // White (Moon)
+                celestialSize = '70px';
+                celestialBlur = '15px';
+                celestialTop = '10%';
+                celestialLeft = '70%';
+                
+                starDisplay = 'block'; // Show shooting stars at night
+                birdDisplay = 'none'; // Hide birds at night
+                planeDisplay = 'none'; // Hide planes at night
             }
 
             document.documentElement.style.setProperty('--sky-gradient', skyGradient);
-            document.documentElement.style.setProperty('--sun-color', sunColor);
-            document.documentElement.style.setProperty('--sun-size', sunSize);
-            document.documentElement.style.setProperty('--sun-blur', sunBlur);
-            document.documentElement.style.setProperty('--sun-top', sunTop);
-            document.documentElement.style.setProperty('--sun-left', sunLeft);
-            document.documentElement.style.setProperty('--sea-color', seaColor);
+            document.documentElement.style.setProperty('--sea-gradient', seaGradient);
+            document.documentElement.style.setProperty('--celestial-color', celestialColor);
+            document.documentElement.style.setProperty('--celestial-size', celestialSize);
+            document.documentElement.style.setProperty('--celestial-blur', celestialBlur);
+            document.documentElement.style.setProperty('--celestial-top', celestialTop);
+            document.documentElement.style.setProperty('--celestial-left', celestialLeft);
+
+            // Set display for animated elements
+            document.querySelectorAll('.bird').forEach(el => el.style.display = birdDisplay);
+            document.querySelectorAll('.plane').forEach(el => el.style.display = planeDisplay);
+            document.querySelectorAll('.shooting-star').forEach(el => el.style.display = starDisplay);
+            
+            // Adjust sky/sea height for parallax effect (simplified for fixed position)
+            document.documentElement.style.setProperty('--sky-height', skyHeight);
             document.documentElement.style.setProperty('--sea-height', seaHeight);
         }
-        setDynamicBackground(); // Set on load
-        setInterval(setDynamicBackground, 60 * 60 * 1000); // Update every hour
+        setDynamicBackgroundAndElements();
+        setInterval(setDynamicBackgroundAndElements, 60 * 60 * 1000); // Update every hour
 
-        // --- Greeting for Reechita ---
+        // --- Greeting for Reechita (with typing effect) ---
         function updateGreeting() {
             const now = new Date();
             const hour = now.getHours();
-            let greetingText;
+            let baseGreeting;
 
             if (hour >= 5 && hour < 12) {
-                greetingText = "Good Morning, Reechita! ☀️";
+                baseGreeting = "Good Morning, Reechita! ☀️";
             } else if (hour >= 12 && hour < 18) {
-                greetingText = "Good Afternoon, Reechita! 🌤️";
+                baseGreeting = "Good Afternoon, Reechita! 🌤️";
             } else {
-                greetingText = "Good Evening, Reechita! 🌙";
+                baseGreeting = "Good Evening, Reechita! 🌙";
             }
-            document.getElementById('greeting').textContent = greetingText;
+            
+            const greetingElement = document.getElementById('greeting');
+            greetingElement.style.width = '0'; // Reset width for typing effect
+            greetingElement.textContent = baseGreeting;
+            greetingElement.style.animation = 'typing 1.5s steps(28, end) forwards, blinkCaret .75s step-end infinite';
         }
-        updateGreeting(); // Set greeting on load
+        updateGreeting();
 
         // --- Rotating Questions ---
         const questions = [
@@ -365,7 +446,7 @@
         }
         displayRandomQuestion(); // Display a question on load
 
-        // --- Countdown Timer Logic ---
+        // --- Countdown Timer Logic (with number bounce) ---
         const targetDate = new Date("July 4, 2025 11:30:00 GMT+0530"); // Target: July 4th, 2025 11:30 AM IST
         const countdownElement = document.getElementById('countdown');
 
@@ -373,7 +454,6 @@
             const now = new Date().getTime();
             const distance = targetDate.getTime() - now;
 
-            // Calculate time components
             const days = Math.floor(distance / (1000 * 60 * 60 * 24));
             const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
             const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
@@ -381,9 +461,8 @@
 
             if (distance < 0) {
                 countdownElement.innerHTML = "It's time! School has started! 🎉";
-                clearInterval(countdownInterval); // Stop the countdown
+                clearInterval(countdownInterval);
             } else {
-                // Generate a unique delay for each number span for staggered animation
                 countdownElement.innerHTML =
                     `<span class="number" style="--delay: 0s;">${days > 0 ? days + "d " : ""}</span>` +
                     `<span class="number" style="--delay: 0.1s;">${hours < 10 ? "0" + hours : hours}h </span>` +
@@ -392,10 +471,7 @@
             }
         }
 
-        // Update the countdown every 1 second
         const countdownInterval = setInterval(updateCountdown, 1000);
-
-        // Run immediately to avoid initial delay
         updateCountdown();
     </script>
 
