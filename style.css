@@ -1,0 +1,272 @@
+/* Keyframe Animations */
+@keyframes fadeInScale {
+    from { opacity: 0; transform: scale(0.8); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.03); }
+    100% { transform: scale(1); }
+}
+
+@keyframes sunMoonMovement {
+    0% { transform: translate(-50%, -50%) scale(1); }
+    50% { transform: translate(-50%, -60%) scale(1.05); }
+    100% { transform: translate(-50%, -50%) scale(1); }
+}
+
+@keyframes birdFly {
+    0% { transform: translateX(-100vw) translateY(var(--bird-y-start, 0)); }
+    100% { transform: translateX(100vw) translateY(var(--bird-y-end, 50px)); }
+}
+
+@keyframes planeFly {
+    0% { transform: translateX(-120vw) translateY(var(--plane-y-start, 0)) scale(0.8); }
+    100% { transform: translateX(100vw) translateY(var(--plane-y-end, -50px)) scale(0.8); }
+}
+
+@keyframes shootingStar {
+    0% { transform: translate(100vw, -100vh) rotate(45deg); opacity: 0; }
+    5% { opacity: 1; }
+    100% { transform: translate(-100vw, 100vh) rotate(45deg); opacity: 0; }
+}
+
+@keyframes waterMovement {
+    0% { background-position: 0% 0%; }
+    100% { background-position: 100% 0%; }
+}
+
+/* Typewriter Animation */
+@keyframes typing {
+    from { width: 0; }
+    to { width: 100%; }
+}
+
+@keyframes blinkCaret {
+    50% { border-color: transparent; }
+}
+
+@keyframes numberBounce {
+    0%, 100% { transform: translateY(0); }
+    25% { transform: translateY(-5px); }
+    50% { transform: translateY(0); }
+    75% { transform: translateY(-2px); }
+}
+
+/* Base Styles */
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: 'Roboto Mono', monospace; /* Typewriter-like font */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* Align content to top for scrolling */
+    align-items: center;
+    min-height: 200vh; /* Make it scrollable */
+    margin: 0;
+    padding: 20px;
+    box-sizing: border-box;
+    color: #fff;
+    overflow-x: hidden; /* Prevent horizontal scroll */
+    position: relative;
+}
+
+/* Dynamic Background Elements - FIXED POSITION */
+.sky-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: var(--sky-height); /* Dynamic sky height */
+    background: var(--sky-gradient);
+    transition: background 2s ease-in-out, height 2s ease-in-out;
+    z-index: 0;
+}
+
+.sea-bg {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: var(--sea-height); /* Dynamic sea height */
+    background: var(--sea-gradient);
+    background-size: 200% 100%; /* For wave animation */
+    animation: waterMovement 30s linear infinite;
+    border-top-left-radius: 50% 10%; /* Gentle wave shape */
+    border-top-right-radius: 50% 10%;
+    transition: background 2s ease-in-out, height 2s ease-in-out;
+    z-index: 1;
+}
+
+.sun-moon {
+    position: fixed;
+    width: var(--celestial-size);
+    height: var(--celestial-size);
+    background: var(--celestial-color);
+    border-radius: 50%;
+    filter: blur(var(--celestial-blur));
+    top: var(--celestial-top);
+    left: var(--celestial-left);
+    animation: sunMoonMovement 20s ease-in-out infinite alternate;
+    z-index: 2;
+    transition: all 2s ease-in-out;
+}
+
+.bird {
+    position: fixed;
+    font-size: 2em;
+    color: var(--bird-color); /* Dynamic bird color */
+    animation: birdFly 15s linear infinite;
+    z-index: 3;
+    opacity: 0.8;
+}
+.bird:nth-child(2) { animation-delay: 5s; animation-duration: 18s; transform: translateX(-100vw) translateY(var(--bird-y-start, 0)) scaleX(-1); }
+.bird:nth-child(3) { animation-delay: 10s; animation-duration: 12s; top: 20%; }
+
+.plane {
+    position: fixed;
+    font-size: 2.5em;
+    color: var(--plane-color); /* Dynamic plane color */
+    animation: planeFly 25s linear infinite;
+    z-index: 4;
+    opacity: 0.6;
+}
+.plane:nth-child(2) { animation-delay: 12s; animation-duration: 28s; transform: translateX(-120vw) translateY(var(--plane-y-start, 0)) scaleX(-1); top: 15%;}
+
+.shooting-star {
+    position: fixed;
+    width: 5px;
+    height: 5px;
+    background: white;
+    box-shadow: 0 0 10px white, 0 0 20px rgba(255, 255, 255, 0.8), 0 0 30px rgba(255, 255, 255, 0.6);
+    border-radius: 50%;
+    animation: shootingStar 4s linear infinite;
+    z-index: 5;
+    display: var(--star-display, none); /* Hide during day */
+}
+.shooting-star:nth-child(2) { animation-delay: 2s; animation-duration: 5s; }
+.shooting-star:nth-child(3) { animation-delay: 6s; animation-duration: 3s; }
+
+/* General particle effect (for sky glow, less dense at night) */
+.particle {
+    position: fixed; /* Keep particles fixed in background */
+    background-color: rgba(255, 255, 255, var(--particle-opacity, 0.8));
+    border-radius: 50%;
+    animation: fadeInScale 5s ease-out infinite alternate; /* Re-using fadeInScale for subtle twinkle */
+    pointer-events: none;
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.7);
+    z-index: 5;
+    display: var(--particle-display, block); /* Hide at night if desired */
+}
+
+/* Main Content Area - SCROLLABLE */
+.content-container {
+    position: relative; /* Allows content to scroll over background */
+    z-index: 10; /* Ensure content is above background elements */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    width: 100%;
+    padding-top: 50px; /* Space from top edge */
+    padding-bottom: 100px; /* Space for scrolling */
+    min-height: 100vh; /* Ensure content starts from here */
+    box-sizing: border-box; /* Include padding in width/height */
+}
+
+.card {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+    padding: 20px 25px;
+    margin: 15px 0;
+    max-width: 700px;
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    animation: fadeInScale 1s ease-out;
+    text-align: center;
+    width: 90%;
+    box-sizing: border-box;
+    opacity: 0; /* Hidden by default for JS reveal/typewriter */
+}
+
+h1 {
+    font-family: 'Pacifico', cursive;
+    font-size: 2.2em;
+    margin-bottom: 15px;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+    color: #FFD700;
+}
+
+/* Typewriter text styling for all relevant elements */
+.typewriter-text {
+    white-space: nowrap; /* Keep on one line */
+    overflow: hidden; /* Hide overflowing text */
+    border-right: .15em solid orange; /* The blinking caret */
+    animation: typing 1s steps(20, end) forwards, blinkCaret .75s step-end infinite;
+    display: inline-block; /* Essential for width calculation */
+    max-width: 100%; /* Ensure it doesn't overflow container */
+    vertical-align: top; /* Align nicely with content */
+}
+/* Override blinkCaret for elements that don't need continuous blinking */
+.typed-once .typewriter-text {
+    border-right: none;
+    animation: typing 1s steps(20, end) forwards;
+}
+
+#greeting {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 1.1em;
+    font-weight: normal;
+    margin-bottom: 10px;
+    color: #FFD700;
+    animation: pulse 2s infinite ease-in-out; /* Pulse is separate from typing */
+}
+
+#countdown {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 2.5em;
+    font-weight: bold;
+    margin-bottom: 20px;
+    letter-spacing: 2px;
+    color: #e0ffff;
+    text-shadow: 2px 2px 7px rgba(0, 0, 0, 0.4);
+    animation: fadeInScale 1.2s ease-out;
+    transition: transform 0.2s ease-out;
+}
+
+#countdown .number {
+    display: inline-block;
+    animation: numberBounce 1s ease-out infinite;
+    animation-delay: var(--delay);
+    padding: 0 3px;
+}
+
+.message-box {
+    border-left: 4px solid #FFC0CB;
+    padding: 15px 20px;
+    font-size: 0.95em;
+    line-height: 1.6;
+}
+
+.emoji {
+    font-size: 1.5em;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+.question-box {
+    font-size: 0.9em;
+    margin-top: 20px;
+    padding: 12px 18px;
+    border-radius: 8px;
+}
+
+.note {
+    margin-top: 30px;
+    font-size: 0.8em;
+    color: rgba(255, 255, 255, 0.7);
+}
