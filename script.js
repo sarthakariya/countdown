@@ -217,7 +217,6 @@ function updateGreeting() {
 const questions = [
     "What's one thing you're looking forward to today?",
     "If you could have any superpower, what would it be?",
-    "What's a fun fact you learned recently?", // Neutralized
     "What's a small act of kindness you can do today?",
     "What's your go-to song when you need a boost?",
     "What's something new you want to learn?",
@@ -225,9 +224,9 @@ const questions = [
     "What makes you smile the most?",
     "What's your favorite subject in school?",
     "What's a dream you have for the future?",
-    "What's one thing that always brightens your day?", // Neutralized
+    "What's one thing that always brightens your day?",
     "If you could spend a day doing anything, what would it be?",
-    "What's your favorite book or movie character?", // Neutralized
+    "What's your favorite book or movie character?",
     "What's a funny memory you have?",
     "What's a goal you're working towards right now?",
     "What's your favorite way to relax?",
