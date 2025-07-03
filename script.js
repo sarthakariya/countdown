@@ -16,57 +16,27 @@ function createParticles(count, minSize, maxSize, animationDuration, animationDe
 }
 createParticles(100, 1, 3, 5, 5); // Many small particles for general ambient effect
 
-// --- Helper function to reset and trigger typewriter animation ---
-function applyTypewriterEffect(element, originalText, isTypedOnce, charSpeed = 0.05, blink = true) {
-    // Store original text in a data attribute for robust access
-    element.dataset.originalText = originalText; 
+// --- NEW: Helper function for fade-in/scale-up text animation ---
+function applyTextRevealEffect(element, originalText, delay = 0) {
+    // Set the full text content immediately
+    element.textContent = originalText;
     
-    // Clear current text content immediately to prepare for typing animation
-    element.textContent = ''; 
+    // Apply animation properties directly
+    element.style.animation = `fadeInScale 0.8s ease-out forwards`;
+    element.style.animationDelay = `${delay}s`;
     
-    // Reset styling for animation to re-trigger
-    element.style.width = '0'; // Start with 0 width
-    element.style.overflow = 'hidden'; // Hide overflow during typing
-    // Set initial caret or no caret based on 'blink' parameter
-    element.style.borderRight = blink ? '.15em solid orange' : 'none'; 
+    // Ensure no border-right (caret)
+    element.style.borderRight = 'none'; 
     
-    // Force a reflow/re-render to ensure animation restarts from scratch
-    void element.offsetWidth; 
-
-    const typingDuration = originalText.length * charSpeed; // Calculate duration
-    
-    // Define the animation string, using 'forwards' to retain final state
-    const animationProperty = blink ? 
-        `typing ${typingDuration}s steps(${originalText.length}, end) forwards, blinkCaret .75s step-end infinite` :
-        `typing ${typingDuration}s steps(${originalText.length}, end) forwards`;
-
-    element.style.animation = animationProperty;
-
-    // IMPORTANT: Set the text content AFTER a very tiny delay.
-    // This allows the CSS animation to begin on an "empty" element,
-    // and then the text appears *under* the expanding width.
-    setTimeout(() => {
-        element.textContent = originalText;
-    }, 10); // A minimal delay (e.g., 10ms) is often sufficient.
-
-    // Add an event listener to handle the end of the typing animation.
-    // This removes the blinking caret and cleans up animation properties.
-    const handleAnimationEnd = () => {
-        // Only remove caret/animation if it's meant to be typed once or not blink
-        if (isTypedOnce || !blink) {
-            element.style.animation = 'none'; // Remove all animation properties
-            element.style.borderRight = 'none'; // Ensure caret is gone
-            element.style.width = 'auto'; // Allow width to be natural after typing
-        }
-        // Remove the event listener to prevent it from firing multiple times
-        element.removeEventListener('animationend', handleAnimationEnd);
-    };
-    element.addEventListener('animationend', handleAnimationEnd, { once: true }); // Use {once: true} for safety
+    // Reset transform/opacity for re-animation if needed
+    element.style.opacity = 0;
+    element.style.transform = 'scale(0.9)';
 }
 
 
-// --- Function to handle card visibility and typewriter effect ---
+// --- Function to handle card visibility and text reveal effect ---
 function revealCardAndTypewrite(card) {
+    // Note: The function name is kept for consistency but now applies 'text reveal'
     if (card.classList.contains('revealed')) {
         card.style.opacity = 1;
         card.style.pointerEvents = 'auto';
@@ -77,16 +47,20 @@ function revealCardAndTypewrite(card) {
     card.style.opacity = 1; 
     card.style.pointerEvents = 'auto'; 
 
-    card.querySelectorAll('.typewriter-text').forEach(textSpan => {
+    let textDelay = 0; // Stagger delay for text elements within a card
+
+    // Apply text reveal effect to all elements with '.text-reveal-animation' class within this card
+    card.querySelectorAll('.text-reveal-animation').forEach(textSpan => {
         const originalText = textSpan.dataset.originalText || textSpan.textContent;
-        const isTypedOnce = textSpan.classList.contains('typed-once');
-        applyTypewriterEffect(textSpan, originalText, isTypedOnce, 0.04); 
+        applyTextRevealEffect(textSpan, originalText, textDelay);
+        textDelay += 0.2; // Add a delay for the next text element in the same card
     });
 
-    const h1Title = card.querySelector('.typewriter-text-h1');
+    // Handle the special H1 title separately if it exists and use the new animation
+    const h1Title = card.querySelector('h1.text-reveal-animation');
     if (h1Title) {
         const originalText = h1Title.dataset.originalText || h1Title.textContent;
-        applyTypewriterEffect(h1Title, originalText, false, 0.06); 
+        applyTextRevealEffect(h1Title, originalText, textDelay); // Give it its own delay
     }
 }
 
@@ -111,26 +85,34 @@ const cardObserver = new IntersectionObserver((entries, observer) => {
 // --- Initial setup for cards on page load ---
 document.addEventListener('DOMContentLoaded', () => {
     const allCards = document.querySelectorAll('.card');
-    let initialDelay = 0; 
+    let initialCardDelay = 0; // Used to stagger the initial reveal of cards
 
     allCards.forEach(card => {
         card.style.opacity = 0; 
         card.style.pointerEvents = 'none'; 
         card.classList.remove('revealed'); 
         
-        // IMPORTANT: Pre-populate data-originalText attributes for all typewriter elements
-        card.querySelectorAll('.typewriter-text, .typewriter-text-h1').forEach(textElement => {
-            // Only set if not already set or if it's currently empty (e.g., from previous failed attempt)
+        // IMPORTANT: Pre-populate data-originalText attributes for all text elements
+        // Also update selectors to the new class
+        card.querySelectorAll('.text-reveal-animation').forEach(textElement => {
             if (!textElement.dataset.originalText || textElement.dataset.originalText === '') { 
-                textElement.dataset.originalText = textElement.textContent || ''; // Ensure it's not null/undefined
+                textElement.dataset.originalText = textElement.textContent || '';
             }
         });
+        // Handle H1 specifically as it might not always have the class initially
+        const h1Title = card.querySelector('h1');
+        if (h1Title && !h1Title.classList.contains('text-reveal-animation')) {
+            h1Title.classList.add('text-reveal-animation');
+            if (!h1Title.dataset.originalText || h1Title.dataset.originalText === '') {
+                h1Title.dataset.originalText = h1Title.textContent || '';
+            }
+        }
     });
 
     const firstCard = document.getElementById('greetingCard');
     if (firstCard) {
         revealCardAndTypewrite(firstCard); 
-        initialDelay = 800; 
+        initialCardDelay = 800; // Delay subsequent cards
     }
 
     allCards.forEach(card => {
@@ -144,8 +126,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (isVisibleOnLoad) {
             setTimeout(() => {
                 revealCardAndTypewrite(card);
-            }, initialDelay);
-            initialDelay += 400; 
+            }, initialCardDelay);
+            initialCardDelay += 400; 
         } else {
             cardObserver.observe(card);
         }
@@ -161,74 +143,72 @@ function setDynamicBackgroundAndElements() {
     let birdDisplay = 'none', planeDisplay = 'none', starDisplay = 'none'; // Permanently hide birds and planes
     let particleDisplay = 'block'; 
     let particleOpacity; 
-    let celestialBlurIntensity; // Variable to control blur based on dimness
+    let celestialBlurIntensity; 
 
     // Dimmed color palettes
     if (hour >= 5 && hour < 7) { // Early Morning / Sunrise (5 AM - 6:59 AM) - Dimmed warm tones
         skyGradient = 'linear-gradient(to bottom, #7a5d4e 0%, #6b4d53 50%, #5e707d 100%)'; 
         seaGradient = 'linear-gradient(to top, #2e4a5c, #3f5a7d)'; 
-        celestialColor = '#e07b27'; // Dimmer orange/red sun
+        celestialColor = '#e07b27'; 
         celestialSize = '80px';
-        celestialBlurIntensity = '20px'; // Less intense blur
+        celestialBlurIntensity = '20px'; 
         celestialTop = '35%'; 
         celestialLeft = '20%';
-        particleOpacity = 0.3; // Dimmer haze
+        particleOpacity = 0.3; 
     } else if (hour >= 7 && hour < 12) { // Morning / Day (7 AM - 11:59 AM) - Dimmed bright blues
         skyGradient = 'linear-gradient(to bottom, #4f7488 0%, #628292 70%, #7e98a7 100%)'; 
         seaGradient = 'linear-gradient(to top, #0f4a7c, #2f5f90)'; 
-        celestialColor = '#b8aa3e'; // Dimmer gold sun
+        celestialColor = '#b8aa3e'; 
         celestialSize = '90px';
-        celestialBlurIntensity = '25px'; // Less intense blur
+        celestialBlurIntensity = '25px'; 
         celestialTop = '20%';
         celestialLeft = '50%';
-        particleOpacity = 0.4; // Dimmer haze
+        particleOpacity = 0.4; 
     } else if (hour >= 12 && hour < 17) { // Afternoon (12 PM - 4:59 PM) - Dimmed deep blues/purples
         skyGradient = 'linear-gradient(to bottom, #3b336b 0%, #292451 60%, #6e8492 100%)'; 
         seaGradient = 'linear-gradient(to top, #00003b, #0f0f4a)'; 
-        celestialColor = '#af6f1c'; // Dimmer orange sun
+        celestialColor = '#af6f1c'; 
         celestialSize = '85px';
-        celestialBlurIntensity = '22px'; // Less intense blur
+        celestialBlurIntensity = '22px'; 
         celestialTop = '25%';
         celestialLeft = '80%';
-        particleOpacity = 0.3; // Dimmer haze
+        particleOpacity = 0.3; 
     } else if (hour >= 17 && hour < 19) { // Sunset (5 PM - 6:59 PM) - Dimmed dramatic tones
         skyGradient = 'linear-gradient(to bottom, #993b2c 0%, #993300 50%, #5d0000 100%)'; 
         seaGradient = 'linear-gradient(to top, #2f5a7d, #3b336b)'; 
-        celestialColor = '#b8aa3e'; // Dimmer gold sun
+        celestialColor = '#b8aa3e'; 
         celestialSize = '100px'; 
-        celestialBlurIntensity = '30px'; // Still some glow but dimmer
+        celestialBlurIntensity = '30px'; 
         celestialTop = '45%'; 
         celestialLeft = '50%';
-        particleOpacity = 0.2; // Very dim haze
+        particleOpacity = 0.2; 
     } else { // Night (7 PM - 4:59 AM) - Deepest dimness, only stars visible
         skyGradient = 'linear-gradient(to bottom, #000010 0%, #000020 50%, #000030 100%)'; 
         seaGradient = 'linear-gradient(to top, #000010, #000020)'; 
-        celestialColor = '#a0a0a0'; // Dimmer white moon
+        celestialColor = '#a0a0a0'; 
         celestialSize = '60px';
-        celestialBlurIntensity = '10px'; // Minimal moon glow
+        celestialBlurIntensity = '10px';
         celestialTop = '15%';
         celestialLeft = '70%';
         
-        starDisplay = 'block'; // Show shooting stars at night
-        particleOpacity = 0.05; // Very dim particles (stars)
+        starDisplay = 'block'; 
+        particleOpacity = 0.05; 
     }
 
     document.documentElement.style.setProperty('--sky-gradient', skyGradient);
     document.documentElement.style.setProperty('--sea-gradient', seaGradient);
     document.documentElement.style.setProperty('--celestial-color', celestialColor);
     document.documentElement.style.setProperty('--celestial-size', celestialSize);
-    document.documentElement.style.setProperty('--celestial-blur', celestialBlurIntensity); // Apply new blur intensity
+    document.documentElement.style.setProperty('--celestial-blur', celestialBlurIntensity);
     document.documentElement.style.setProperty('--celestial-top', celestialTop);
     document.documentElement.style.setProperty('--celestial-left', celestialLeft);
 
-    // Hide birds and planes explicitly
     document.querySelectorAll('.bird').forEach(el => el.style.display = birdDisplay);
     document.querySelectorAll('.plane').forEach(el => el.style.display = planeDisplay);
     document.querySelectorAll('.shooting-star').forEach(el => el.style.display = starDisplay);
     document.querySelectorAll('.particle').forEach(el => el.style.setProperty('--particle-opacity', particleOpacity));
     document.documentElement.style.setProperty('--particle-display', particleDisplay); 
 
-    // These heights remain fixed for the fixed background elements
     document.documentElement.style.setProperty('--sky-height', '70%');
     document.documentElement.style.setProperty('--sea-height', '30%');
 }
@@ -250,14 +230,15 @@ function updateGreeting() {
     }
     
     const greetingElement = document.getElementById('greeting');
-    let typedTextSpan = greetingElement.querySelector('.typewriter-text');
-    if (!typedTextSpan) { 
-        typedTextSpan = document.createElement('span');
-        typedTextSpan.classList.add('typewriter-text');
+    // Using the new class for greeting
+    let textRevealSpan = greetingElement.querySelector('.text-reveal-animation');
+    if (!textRevealSpan) { 
+        textRevealSpan = document.createElement('span');
+        textRevealSpan.classList.add('text-reveal-animation');
         greetingElement.innerHTML = ''; 
-        greetingElement.appendChild(typedTextSpan);
+        greetingElement.appendChild(textRevealSpan);
     }
-    applyTypewriterEffect(typedTextSpan, baseGreeting, false, 0.05, true); 
+    applyTextRevealEffect(textRevealSpan, baseGreeting, 0); // No initial delay for greeting
 }
 updateGreeting(); 
 
@@ -290,14 +271,15 @@ function displayRandomQuestion() {
     const questionText = questions[randomIndex];
     const dailyQuestionElement = document.getElementById('dailyQuestion');
     
-    let typedTextSpan = dailyQuestionElement.querySelector('.typewriter-text');
-    if (!typedTextSpan) {
-        typedTextSpan = document.createElement('span');
-        typedTextSpan.classList.add('typewriter-text', 'typed-once');
+    // Using the new class for question
+    let textRevealSpan = dailyQuestionElement.querySelector('.text-reveal-animation');
+    if (!textRevealSpan) {
+        textRevealSpan = document.createElement('span');
+        textRevealSpan.classList.add('text-reveal-animation'); // No longer 'typed-once'
         dailyQuestionElement.innerHTML = ''; 
-        dailyQuestionElement.appendChild(typedTextSpan);
+        dailyQuestionElement.appendChild(textRevealSpan);
     }
-    applyTypewriterEffect(typedTextSpan, questionText, true, 0.04, false); 
+    applyTextRevealEffect(textRevealSpan, questionText, 0); // No initial delay for question
 }
 displayRandomQuestion(); 
 
@@ -315,18 +297,20 @@ function updateCountdown() {
     const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
     if (distance < 0) {
-        let typedTextSpan = countdownElement.querySelector('.typewriter-text.typed-once');
-        if (!typedTextSpan) { 
-            typedTextSpan = document.createElement('span');
-            typedTextSpan.classList.add('typewriter-text', 'typed-once');
+        // Special case for 'It's time!' to be revealed
+        let textRevealSpan = countdownElement.querySelector('.text-reveal-animation'); // New class
+        if (!textRevealSpan) { 
+            textRevealSpan = document.createElement('span');
+            textRevealSpan.classList.add('text-reveal-animation');
             countdownElement.innerHTML = ''; 
-            countdownElement.appendChild(typedTextSpan);
-            applyTypewriterEffect(typedTextSpan, "It's time! School has started! 🎉", true, 0.05, false);
-        } else if (typedTextSpan.dataset.originalText !== "It's time! School has started! 🎉") {
-            applyTypewriterEffect(typedTextSpan, "It's time! School has started! 🎉", true, 0.05, false);
+            countdownElement.appendChild(textRevealSpan);
+            applyTextRevealEffect(textRevealSpan, "It's time! School has started! 🎉", 0);
+        } else if (textRevealSpan.textContent !== "It's time! School has started! 🎉") { // Check current text content
+            applyTextRevealEffect(textRevealSpan, "It's time! School has started! 🎉", 0);
         }
         clearInterval(countdownInterval); 
     } else {
+        // If countdown is active, display numbers directly (no animation needed for numbers)
         countdownElement.innerHTML =
             `<span class="number" style="--delay: 0s;">${days > 0 ? days + "d " : ""}</span>` +
             `<span class="number" style="--delay: 0.1s;">${hours < 10 ? "0" + hours : hours}h </span>` +
