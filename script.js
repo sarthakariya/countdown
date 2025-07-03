@@ -1,4 +1,4 @@
-// --- Particle background effect (for subtle sky glow) ---
+// --- Particle background effect (for subtle sky glow / stars) ---
 function createParticles(count, minSize, maxSize, animationDuration, animationDelay) {
     const body = document.body;
     for (let i = 0; i < count; i++) {
@@ -16,7 +16,65 @@ function createParticles(count, minSize, maxSize, animationDuration, animationDe
 }
 createParticles(100, 1, 3, 5, 5); // Many small particles for general ambient effect
 
-// --- Intersection Observer for revealing cards and triggering typewriter ---
+// --- Helper function to reset and trigger typewriter animation ---
+function applyTypewriterEffect(element, originalText, isTypedOnce, charSpeed = 0.05, blink = true) {
+    element.dataset.originalText = originalText; // Store original text
+    element.textContent = ''; // Clear text to re-type
+    element.style.width = '0'; // Reset width for typing
+    element.style.overflow = 'hidden'; // Ensure overflow hidden during typing
+
+    // Clear any existing animation to ensure it restarts
+    element.style.animation = 'none';
+    void element.offsetWidth; // Trigger reflow to apply 'none'
+
+    const typingDuration = originalText.length * charSpeed; // Calculate duration based on text length and speed
+    const animationProperty = blink ? 
+        `typing ${typingDuration}s steps(${originalText.length}, end) forwards, blinkCaret .75s step-end infinite` :
+        `typing ${typingDuration}s steps(${originalText.length}, end) forwards`;
+
+    element.style.animation = animationProperty;
+
+    // Set the actual text after a small delay to allow animation reset
+    setTimeout(() => {
+        element.textContent = originalText;
+        if (isTypedOnce || !blink) { // If it's a "typed-once" or non-blinking element
+            element.addEventListener('animationend', () => {
+                element.style.animation = 'none';
+                element.style.borderRight = 'none';
+            }, { once: true });
+        }
+    }, 50); // Small delay to ensure animation applies
+}
+
+// --- Function to handle card visibility and typewriter effect ---
+function revealCardAndTypewrite(card) {
+    if (card.classList.contains('revealed')) {
+        card.style.opacity = 1;
+        card.style.pointerEvents = 'auto';
+        return; // Prevent re-revealing
+    }
+    
+    card.classList.add('revealed'); // Mark as revealed
+    card.style.opacity = 1; // Make card visible
+    card.style.pointerEvents = 'auto'; // Re-enable interaction
+
+    // Trigger typewriter for all .typewriter-text elements within this card
+    card.querySelectorAll('.typewriter-text').forEach(textSpan => {
+        const originalText = textSpan.dataset.originalText || textSpan.textContent;
+        const isTypedOnce = textSpan.classList.contains('typed-once');
+        applyTypewriterEffect(textSpan, originalText, isTypedOnce, 0.04); // Slightly faster for general text
+    });
+
+    // For the h1 title (which is not a .typewriter-text span)
+    const h1Title = card.querySelector('.typewriter-text-h1');
+    if (h1Title) {
+        const originalText = h1Title.dataset.originalText || h1Title.textContent;
+        applyTypewriterEffect(h1Title, originalText, false, 0.06); // Slower, more impactful for h1
+    }
+}
+
+
+// --- Intersection Observer for cards that come into view by scrolling ---
 const observerOptions = {
     root: null, // viewport
     rootMargin: '0px',
@@ -26,67 +84,54 @@ const observerOptions = {
 const cardObserver = new IntersectionObserver((entries, observer) => {
     entries.forEach(entry => {
         if (entry.isIntersecting) {
-            const card = entry.target;
-            card.style.opacity = 1; // Make card visible
-            card.style.pointerEvents = 'auto'; // Re-enable interaction if disabled
-            
-            // Trigger typewriter for all .typewriter-text elements within this card
-            card.querySelectorAll('.typewriter-text').forEach(textSpan => {
-                const originalText = textSpan.textContent;
-                textSpan.textContent = ''; // Clear text to re-type
-                textSpan.style.width = '0'; // Reset width for typing
-                
-                // Add class to remove blinking caret after typing is done
-                const isTypedOnce = textSpan.classList.contains('typed-once');
-                if (isTypedOnce) {
-                    textSpan.style.animation = `typing ${originalText.length * 0.05}s steps(${originalText.length}, end) forwards`;
-                } else {
-                    textSpan.style.animation = `typing ${originalText.length * 0.05}s steps(${originalText.length}, end) forwards, blinkCaret .75s step-end infinite`;
-                }
-
-                // Set the actual text after a small delay to allow animation reset
-                setTimeout(() => {
-                    textSpan.textContent = originalText;
-                    if (isTypedOnce) {
-                        // If it's a "typed-once" element, remove animation after completion
-                        textSpan.addEventListener('animationend', () => {
-                            textSpan.style.animation = 'none';
-                            textSpan.style.borderRight = 'none';
-                        }, { once: true });
-                    }
-                }, 50); // Small delay
-            });
-
-            // For the h1 title (which is not a .typewriter-text span)
-            const h1Title = card.querySelector('.typewriter-text-h1');
-            if (h1Title) {
-                const originalText = h1Title.textContent;
-                h1Title.textContent = '';
-                h1Title.style.width = '0';
-                h1Title.style.overflow = 'hidden';
-                h1Title.style.borderRight = '.15em solid orange'; // Add caret for h1
-                h1Title.style.animation = `typing ${originalText.length * 0.08}s steps(${originalText.length}, end) forwards, blinkCaret .75s step-end infinite`;
-                
-                setTimeout(() => {
-                    h1Title.textContent = originalText;
-                    h1Title.addEventListener('animationend', () => {
-                        h1Title.style.borderRight = 'none'; // Remove caret for h1 after typing
-                    }, { once: true });
-                }, 50);
-            }
-
-
-            observer.unobserve(card); // Stop observing once animated
+            revealCardAndTypewrite(entry.target);
+            observer.unobserve(entry.target); // Stop observing once revealed
         }
     });
 }, observerOptions);
 
-// Observe each card
-document.querySelectorAll('.card').forEach(card => {
-    card.style.opacity = 0; // Hide all cards initially
-    card.style.pointerEvents = 'none'; // Disable interactions until visible
-    cardObserver.observe(card);
+// --- Initial setup for cards on page load ---
+document.addEventListener('DOMContentLoaded', () => {
+    const allCards = document.querySelectorAll('.card');
+    let initialDelay = 0; // For staggered initial reveals
+
+    // Reset all cards to initial hidden state before observation
+    allCards.forEach(card => {
+        card.style.opacity = 0;
+        card.style.pointerEvents = 'none';
+        card.classList.remove('revealed'); // Ensure no previous 'revealed' state
+    });
+
+    // Manually handle the first card (greeting/countdown) to ensure it always appears first
+    const firstCard = document.getElementById('greetingCard');
+    if (firstCard) {
+        revealCardAndTypewrite(firstCard);
+        initialDelay = 800; // Add an initial delay for subsequent cards if the first one is immediate
+    }
+
+    // Now observe the rest of the cards, applying staggered reveal for those initially visible
+    allCards.forEach(card => {
+        if (card === firstCard) { // Skip the first card if it's already handled
+            return;
+        }
+
+        const rect = card.getBoundingClientRect();
+        // Check if card is immediately visible on load (even partially)
+        const isVisibleOnLoad = (rect.top < window.innerHeight && rect.bottom > 0);
+
+        if (isVisibleOnLoad) {
+            // Apply initial fade-in and typewriter with a staggered delay
+            setTimeout(() => {
+                revealCardAndTypewrite(card);
+            }, initialDelay);
+            initialDelay += 400; // Stagger initial reveal more spaced out
+        } else {
+            // If not visible, observe it for when it scrolls into view
+            cardObserver.observe(card);
+        }
+    });
 });
+
 
 // --- Dynamic Background (Sky, Sea, Sun/Moon, and Animated Elements) ---
 function setDynamicBackgroundAndElements() {
@@ -95,59 +140,68 @@ function setDynamicBackgroundAndElements() {
     let skyGradient, seaGradient, celestialColor, celestialSize, celestialBlur, celestialTop, celestialLeft;
     let birdDisplay = 'block', planeDisplay = 'block', starDisplay = 'none';
     let birdColor = '#333', planeColor = '#ccc';
-    let particleOpacity = 0.8; // More particles for general glow during day
+    let particleDisplay = 'block'; // Particles (haze/stars) always on
+    let particleOpacity = 0.8; // More opaque during day (haze), less at night (stars)
     
-    // Time periods and corresponding styles
+    // Time periods and corresponding styles for realism
+    // Colors are chosen to blend smoothly and evoke realistic atmosphere
     if (hour >= 5 && hour < 7) { // Early Morning / Sunrise (5 AM - 6:59 AM)
-        skyGradient = 'linear-gradient(to bottom, #FFDAB9, #FFB6C1, #87CEEB)'; // Peach, LightPink, SkyBlue
-        seaGradient = 'linear-gradient(to right, #4682B4, #6495ED)'; // SteelBlue, CornflowerBlue
+        skyGradient = 'linear-gradient(to bottom, #FFDAB9 0%, #FFB6C1 50%, #B0E0E6 100%)'; // Peach to Light Pink to Powder Blue (for horizon)
+        seaGradient = 'linear-gradient(to top, #4682B4, #6495ED)'; // SteelBlue to CornflowerBlue (deepens slightly from horizon)
         celestialColor = '#FF8C00'; // DarkOrange (Sun)
-        celestialSize = '80px';
-        celestialBlur = '25px';
-        celestialTop = '25%';
-        celestialLeft = '20%';
-        planeColor = '#eee';
-    } else if (hour >= 7 && hour < 12) { // Morning / Day (7 AM - 11:59 AM)
-        skyGradient = 'linear-gradient(to bottom, #87CEEB, #ADD8E6, #B0E0E6)'; // SkyBlue, LightBlue, PowderBlue
-        seaGradient = 'linear-gradient(to right, #1E90FF, #4169E1)'; // DodgerBlue, RoyalBlue
-        celestialColor = '#FFD700'; // Gold (Sun)
         celestialSize = '90px';
         celestialBlur = '30px';
+        celestialTop = '30%'; // Lower in the sky
+        celestialLeft = '20%';
+        planeColor = '#eee';
+        birdColor = '#555';
+        particleOpacity = 0.6; // Haze
+    } else if (hour >= 7 && hour < 12) { // Morning / Day (7 AM - 11:59 AM)
+        skyGradient = 'linear-gradient(to bottom, #87CEEB 0%, #ADD8E6 70%, #E0FFFF 100%)'; // SkyBlue to LightBlue to Light Cyan (brightest near horizon)
+        seaGradient = 'linear-gradient(to top, #1E90FF, #4169E1)'; // DodgerBlue to RoyalBlue (bright, clear sea)
+        celestialColor = '#FFD700'; // Gold (Sun)
+        celestialSize = '100px';
+        celestialBlur = '40px'; // Stronger glow
         celestialTop = '15%';
         celestialLeft = '50%';
         planeColor = '#fff';
+        birdColor = '#333';
+        particleOpacity = 0.7; // Brighter haze
     } else if (hour >= 12 && hour < 17) { // Afternoon (12 PM - 4:59 PM)
-        skyGradient = 'linear-gradient(to bottom, #6A5ACD, #483D8B, #191970)'; // SlateBlue, DarkSlateBlue, MidnightBlue
-        seaGradient = 'linear-gradient(to right, #000080, #191970)'; // Navy, MidnightBlue
+        skyGradient = 'linear-gradient(to bottom, #6A5ACD 0%, #483D8B 60%, #ADD8E6 100%)'; // SlateBlue to DarkSlateBlue to LightBlue (deeper sky, bright horizon)
+        seaGradient = 'linear-gradient(to top, #000080, #191970)'; // Navy to MidnightBlue (deep, intense sea)
         celestialColor = '#FFA500'; // Orange (Sun)
-        celestialSize = '85px';
-        celestialBlur = '28px';
+        celestialSize = '95px';
+        celestialBlur = '35px';
         celestialTop = '20%';
         celestialLeft = '80%';
         planeColor = '#ccc';
+        birdColor = '#444';
+        particleOpacity = 0.6; // Afternoon haze
     } else if (hour >= 17 && hour < 19) { // Sunset (5 PM - 6:59 PM)
-        skyGradient = 'linear-gradient(to bottom, #FF6347, #FF4500, #8B0000)'; // Tomato, OrangeRed, DarkRed
-        seaGradient = 'linear-gradient(to right, #4169E1, #6A5ACD)'; // RoyalBlue, SlateBlue
+        skyGradient = 'linear-gradient(to bottom, #FF6347 0%, #FF4500 50%, #8B0000 100%)'; // Tomato to OrangeRed to DarkRed (dramatic sunset hues)
+        seaGradient = 'linear-gradient(to top, #4169E1, #6A5ACD)'; // RoyalBlue to SlateBlue (reflecting sunset)
         celestialColor = '#FFD700'; // Gold (Sun)
-        celestialSize = '100px';
-        celestialBlur = '40px';
-        celestialTop = '40%';
+        celestialSize = '110px'; // Largest at sunset
+        celestialBlur = '50px'; // Max glow
+        celestialTop = '40%'; // Closest to horizon
         celestialLeft = '50%';
         planeColor = '#aaa';
+        birdColor = '#222';
+        particleOpacity = 0.5; // Fading haze
     } else { // Night (7 PM - 4:59 AM)
-        skyGradient = 'linear-gradient(to bottom, #000033, #000066, #191970)'; // Darker blues for night
-        seaGradient = 'linear-gradient(to right, #000033, #000066)'; // Very dark blue for night sea
+        skyGradient = 'linear-gradient(to bottom, #000022 0%, #000044 50%, #000066 100%)'; // Very dark blue to deep blue (for stars)
+        seaGradient = 'linear-gradient(to top, #000022, #000044)'; // Very dark sea
         celestialColor = '#E0E0E0'; // White (Moon)
         celestialSize = '70px';
-        celestialBlur = '15px';
+        celestialBlur = '20px';
         celestialTop = '10%';
         celestialLeft = '70%';
         
         starDisplay = 'block'; // Show shooting stars at night
         birdDisplay = 'none'; // Hide birds at night
         planeDisplay = 'none'; // Hide planes at night
-        particleOpacity = 0.1; // Less visible particles at night
-        birdColor = '#000'; // Birds can be darker against brighter sky
+        particleOpacity = 0.1; // Dimmer particles (stars)
     }
 
     document.documentElement.style.setProperty('--sky-gradient', skyGradient);
@@ -158,12 +212,13 @@ function setDynamicBackgroundAndElements() {
     document.documentElement.style.setProperty('--celestial-top', celestialTop);
     document.documentElement.style.setProperty('--celestial-left', celestialLeft);
 
-    // Set display for animated elements
+    // Set display for animated elements based on time of day
     document.querySelectorAll('.bird').forEach(el => el.style.display = birdDisplay);
     document.querySelectorAll('.plane').forEach(el => el.style.display = planeDisplay);
     document.querySelectorAll('.shooting-star').forEach(el => el.style.display = starDisplay);
     document.querySelectorAll('.particle').forEach(el => el.style.setProperty('--particle-opacity', particleOpacity));
-    
+    document.documentElement.style.setProperty('--particle-display', particleDisplay); // Control particle visibility
+
     document.documentElement.style.setProperty('--bird-color', birdColor);
     document.documentElement.style.setProperty('--plane-color', planeColor);
 
@@ -172,9 +227,10 @@ function setDynamicBackgroundAndElements() {
     document.documentElement.style.setProperty('--sea-height', '30%');
 }
 setDynamicBackgroundAndElements();
-setInterval(setDynamicBackgroundAndElements, 60 * 60 * 1000); // Update every hour
+// Update the background every 10 minutes (or change to 60 * 60 * 1000 for hourly)
+setInterval(setDynamicBackgroundAndElements, 10 * 60 * 1000); 
 
-// --- Greeting for Reechita (re-triggers typing every reload/update) ---
+// --- Greeting Logic ---
 function updateGreeting() {
     const now = new Date();
     const hour = now.getHours();
@@ -189,21 +245,17 @@ function updateGreeting() {
     }
     
     const greetingElement = document.getElementById('greeting');
-    // Create a span to hold the text and apply typewriter effect
-    const typedTextSpan = document.createElement('span');
-    typedTextSpan.classList.add('typewriter-text');
-    typedTextSpan.textContent = baseGreeting;
-    
-    greetingElement.innerHTML = ''; // Clear previous content
-    greetingElement.appendChild(typedTextSpan);
-    
-    // Manually trigger reflow to restart animation if needed
-    void typedTextSpan.offsetWidth;
-    typedTextSpan.style.animation = `typing ${baseGreeting.length * 0.05}s steps(${baseGreeting.length}, end) forwards, blinkCaret .75s step-end infinite`;
+    const typedTextSpan = greetingElement.querySelector('.typewriter-text') || document.createElement('span');
+    if (!typedTextSpan.parentElement) { // If it's a new span, append it
+        typedTextSpan.classList.add('typewriter-text');
+        greetingElement.innerHTML = '';
+        greetingElement.appendChild(typedTextSpan);
+    }
+    applyTypewriterEffect(typedTextSpan, baseGreeting, false, 0.05, true); // Always blinks
 }
 updateGreeting();
 
-// --- Rotating Questions (re-triggers typing every reload) ---
+// --- Rotating Questions Logic ---
 const questions = [
     "What's one thing you're looking forward to today?",
     "If you could have any superpower, what would it be?",
@@ -232,20 +284,13 @@ function displayRandomQuestion() {
     const questionText = questions[randomIndex];
     const dailyQuestionElement = document.getElementById('dailyQuestion');
     
-    // Create a span to hold the text and apply typewriter effect
-    const typedTextSpan = document.createElement('span');
-    typedTextSpan.classList.add('typewriter-text', 'typed-once');
-    typedTextSpan.textContent = questionText;
-    
-    dailyQuestionElement.innerHTML = ''; // Clear previous content
-    dailyQuestionElement.appendChild(typedTextSpan);
-
-    // Manually trigger reflow and set animation
-    void typedTextSpan.offsetWidth;
-    typedTextSpan.style.animation = `typing ${questionText.length * 0.05}s steps(${questionText.length}, end) forwards`;
-    typedTextSpan.addEventListener('animationend', () => {
-        typedTextSpan.style.borderRight = 'none'; // Remove caret after typing
-    }, { once: true });
+    const typedTextSpan = dailyQuestionElement.querySelector('.typewriter-text') || document.createElement('span');
+    if (!typedTextSpan.parentElement) {
+        typedTextSpan.classList.add('typewriter-text', 'typed-once');
+        dailyQuestionElement.innerHTML = '';
+        dailyQuestionElement.appendChild(typedTextSpan);
+    }
+    applyTypewriterEffect(typedTextSpan, questionText, true, 0.04, false); // Doesn't blink after typing
 }
 displayRandomQuestion(); // Display a question on load
 
@@ -263,18 +308,13 @@ function updateCountdown() {
     const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
     if (distance < 0) {
-        // Special case for 'It's time!' to be typed
-        if (!countdownElement.querySelector('.typed-once')) { // Only type if not already typed
-            const typedTextSpan = document.createElement('span');
-            typedTextSpan.classList.add('typewriter-text', 'typed-once');
-            typedTextSpan.textContent = "It's time! School has started! 🎉";
-            countdownElement.innerHTML = '';
-            countdownElement.appendChild(typedTextSpan);
-            void typedTextSpan.offsetWidth;
-            typedTextSpan.style.animation = `typing ${typedTextSpan.textContent.length * 0.05}s steps(${typedTextSpan.textContent.length}, end) forwards`;
-            typedTextSpan.addEventListener('animationend', () => {
-                typedTextSpan.style.borderRight = 'none';
-            }, { once: true });
+        const typedTextSpan = countdownElement.querySelector('.typed-once');
+        if (!typedTextSpan || typedTextSpan.dataset.originalText !== "It's time! School has started! 🎉") {
+            const newTypedSpan = document.createElement('span');
+            newTypedSpan.classList.add('typewriter-text', 'typed-once');
+            countdownElement.innerHTML = ''; // Clear previous content
+            countdownElement.appendChild(newTypedSpan);
+            applyTypewriterEffect(newTypedSpan, "It's time! School has started! 🎉", true, 0.05, false);
         }
         clearInterval(countdownInterval);
     } else {
@@ -287,4 +327,4 @@ function updateCountdown() {
 }
 
 const countdownInterval = setInterval(updateCountdown, 1000);
-updateCountdown();
+updateCountdown(); // Call immediately to avoid initial empty state
