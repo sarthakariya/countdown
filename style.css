@@ -1,37 +1,28 @@
 /* --- Keyframe Animations --- */
+/* For smooth reveal and gentle pop-in for cards and now text elements */
 @keyframes fadeInScale {
     from { opacity: 0; transform: scale(0.9); }
     to { opacity: 1; transform: scale(1); }
 }
 
+/* Subtle pulsing effect for the greeting */
 @keyframes pulse {
     0% { transform: scale(1); }
     50% { transform: scale(1.02); }
     100% { transform: scale(1); }
 }
 
+/* Sun/Moon gentle bobbing movement */
 @keyframes sunMoonMovement {
     0% { transform: translate(-50%, -50%) scale(1); }
     50% { transform: translate(-50%, -52%) scale(1.01); }
     100% { transform: translate(-50%, -50%) scale(1); }
 }
 
-/* Birds and Planes - Ensure they are hidden by default */
-.bird, .plane {
-    display: none; /* Permanently hide these elements */
-    position: fixed; /* Keep position properties for other potential uses if display changes */
-    /* Keeping other animation/styling properties, though they won't be visible */
-}
-
-/* Original bird/plane animations (won't run due to display: none) */
-@keyframes birdFly {
-    0% { transform: translateX(-100vw) translateY(var(--bird-y-start, 0)); }
-    100% { transform: translateX(100vw) translateY(var(--bird-y-end, 50px)); }
-}
-
-@keyframes planeFly {
-    0% { transform: translateX(-120vw) translateY(var(--plane-y-start, 0)) scale(0.8); }
-    100% { transform: translateX(100vw) translateY(var(--plane-y-end, -50px)) scale(0.8); }
+/* Water gentle movement */
+@keyframes waterMovement {
+    0% { background-position: 0% 0%; }
+    100% { background-position: 100% 0%; }
 }
 
 /* Shooting star animation for night */
@@ -39,23 +30,6 @@
     0% { transform: translate(100vw, -100vh) rotate(45deg); opacity: 0; }
     5% { opacity: 1; }
     100% { transform: translate(-100vw, 100vh) rotate(45deg); opacity: 0; }
-}
-
-/* Gentle movement for the "water" effect */
-@keyframes waterMovement {
-    0% { background-position: 0% 0%; }
-    100% { background-position: 100% 0%; }
-}
-
-/* Typewriter effect: revealing text character by character */
-@keyframes typing {
-    from { width: 0; }
-    to { width: 100%; }
-}
-
-/* Blinking caret for typewriter effect */
-@keyframes blinkCaret {
-    50% { border-color: transparent; }
 }
 
 /* Slight bounce for countdown numbers */
@@ -126,7 +100,7 @@ body {
     height: var(--celestial-size);
     background: var(--celestial-color);
     border-radius: 50%;
-    filter: blur(var(--celestial-blur)); /* Controlled by JS for glow and dimness */
+    filter: blur(var(--celestial-blur));
     top: var(--celestial-top);
     left: var(--celestial-left);
     animation: sunMoonMovement 20s ease-in-out infinite alternate;
@@ -134,6 +108,12 @@ body {
     transition: all 2s ease-in-out;
 }
 
+/* Birds and Planes - Ensure they are hidden by default */
+.bird, .plane {
+    display: none; /* Permanently hide these elements */
+}
+
+/* Shooting Stars */
 .shooting-star {
     position: fixed;
     width: 5px;
@@ -148,9 +128,10 @@ body {
 .shooting-star:nth-child(2) { animation-delay: 2s; animation-duration: 5s; }
 .shooting-star:nth-child(3) { animation-delay: 6s; animation-duration: 3s; }
 
+/* General particles (stars at night, subtle haze/glow during day) */
 .particle {
     position: fixed;
-    background-color: rgba(255, 255, 255, var(--particle-opacity, 0.8)); /* Opacity controlled by JS for dimness */
+    background-color: rgba(255, 255, 255, var(--particle-opacity, 0.8));
     border-radius: 50%;
     animation: shimmer 5s ease-out infinite alternate; 
     pointer-events: none;
@@ -185,8 +166,8 @@ body {
     text-align: center;
     width: 90%;
     box-sizing: border-box;
-    opacity: 0;
-    transition: opacity 0.6s ease-out;
+    opacity: 0; /* Hidden by default, revealed by JS */
+    transition: opacity 0.6s ease-out; /* Smooth fade-in transition */
 }
 
 h1 {
@@ -197,30 +178,34 @@ h1 {
     color: #FFD700;
 }
 
-.typewriter-text {
-    white-space: nowrap;
-    overflow: hidden;
-    border-right: .15em solid orange;
-    animation: typing 1s steps(20, end) forwards, blinkCaret .75s step-end infinite;
-    display: inline-block;
-    max-width: 100%;
-    vertical-align: top;
-    font-size: 1em;
+/* New: Styles for text elements that will fade in/scale up */
+.text-reveal-animation {
+    display: inline-block; /* Essential for transform to work correctly */
+    opacity: 0; /* Hidden by default, JS will apply animation */
+    transform: scale(0.9); /* Slightly scaled down by default */
+    /* animation properties will be set by JS */
+    font-size: 1em; /* Default size */
     line-height: 1.5;
-}
-.typed-once .typewriter-text {
-    border-right: none;
-    animation: typing 1s steps(20, end) forwards;
+    white-space: normal; /* Allow text to wrap naturally now */
 }
 
-#greeting {
+#greeting .text-reveal-animation {
     font-family: 'Press Start 2P', cursive;
     font-size: 1.2em;
     font-weight: normal;
-    margin-bottom: 15px;
     color: #FFD700;
-    animation: pulse 2s infinite ease-in-out;
 }
+
+#dailyQuestion.text-reveal-animation {
+    font-size: 0.95em;
+}
+
+/* No specific typewriter-text-h1 class, will use text-reveal-animation */
+.card h1.text-reveal-animation {
+    /* H1's own font and size are defined above, just ensuring it gets the animation */
+    display: block; /* H1 should be block level */
+}
+
 
 #countdown {
     font-family: 'Press Start 2P', cursive;
