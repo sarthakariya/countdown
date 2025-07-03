@@ -14,29 +14,20 @@ function createParticles(count, minSize, maxSize, animationDuration, animationDe
         body.appendChild(particle);
     }
 }
-createParticles(100, 1, 3, 5, 5); // Many small particles for general ambient effect
+createParticles(50, 1, 3, 5, 5); // Reduced particle count from 100 to 50 for simplicity.
 
-// --- NEW: Helper function for fade-in/scale-up text animation ---
+// --- Helper function for fade-in/scale-up text animation ---
 function applyTextRevealEffect(element, originalText, delay = 0) {
-    // Set the full text content immediately
     element.textContent = originalText;
-    
-    // Apply animation properties directly
-    element.style.animation = `fadeInScale 0.8s ease-out forwards`;
-    element.style.animationDelay = `${delay}s`;
-    
-    // Ensure no border-right (caret)
-    element.style.borderRight = 'none'; 
-    
-    // Reset transform/opacity for re-animation if needed
     element.style.opacity = 0;
     element.style.transform = 'scale(0.9)';
+    element.style.animation = `fadeInScale 0.8s ease-out forwards`;
+    element.style.animationDelay = `${delay}s`;
 }
 
 
 // --- Function to handle card visibility and text reveal effect ---
 function revealCardAndTypewrite(card) {
-    // Note: The function name is kept for consistency but now applies 'text reveal'
     if (card.classList.contains('revealed')) {
         card.style.opacity = 1;
         card.style.pointerEvents = 'auto';
@@ -47,21 +38,14 @@ function revealCardAndTypewrite(card) {
     card.style.opacity = 1; 
     card.style.pointerEvents = 'auto'; 
 
-    let textDelay = 0; // Stagger delay for text elements within a card
+    let textDelay = 0; 
 
-    // Apply text reveal effect to all elements with '.text-reveal-animation' class within this card
+    // Apply text reveal effect to all elements with '.text-reveal-animation' class within THIS card
     card.querySelectorAll('.text-reveal-animation').forEach(textSpan => {
         const originalText = textSpan.dataset.originalText || textSpan.textContent;
         applyTextRevealEffect(textSpan, originalText, textDelay);
-        textDelay += 0.2; // Add a delay for the next text element in the same card
+        textDelay += 0.2; 
     });
-
-    // Handle the special H1 title separately if it exists and use the new animation
-    const h1Title = card.querySelector('h1.text-reveal-animation');
-    if (h1Title) {
-        const originalText = h1Title.dataset.originalText || h1Title.textContent;
-        applyTextRevealEffect(h1Title, originalText, textDelay); // Give it its own delay
-    }
 }
 
 
@@ -82,54 +66,47 @@ const cardObserver = new IntersectionObserver((entries, observer) => {
 }, observerOptions);
 
 
-// --- Initial setup for cards on page load ---
+// --- Initial setup for elements on page load ---
 document.addEventListener('DOMContentLoaded', () => {
-    const allCards = document.querySelectorAll('.card');
-    let initialCardDelay = 0; // Used to stagger the initial reveal of cards
-
-    allCards.forEach(card => {
+    // Hide all cards initially and pre-populate text content
+    document.querySelectorAll('.card').forEach(card => {
         card.style.opacity = 0; 
         card.style.pointerEvents = 'none'; 
         card.classList.remove('revealed'); 
         
-        // IMPORTANT: Pre-populate data-originalText attributes for all text elements
-        // Also update selectors to the new class
         card.querySelectorAll('.text-reveal-animation').forEach(textElement => {
             if (!textElement.dataset.originalText || textElement.dataset.originalText === '') { 
                 textElement.dataset.originalText = textElement.textContent || '';
             }
         });
-        // Handle H1 specifically as it might not always have the class initially
-        const h1Title = card.querySelector('h1');
-        if (h1Title && !h1Title.classList.contains('text-reveal-animation')) {
-            h1Title.classList.add('text-reveal-animation');
-            if (!h1Title.dataset.originalText || h1Title.dataset.originalText === '') {
-                h1Title.dataset.originalText = h1Title.textContent || '';
-            }
-        }
     });
 
-    const firstCard = document.getElementById('greetingCard');
-    if (firstCard) {
-        revealCardAndTypewrite(firstCard); 
-        initialCardDelay = 800; // Delay subsequent cards
+    // 1. Handle the standalone greeting text animation immediately
+    const greetingElement = document.getElementById('greeting');
+    if (greetingElement) {
+        greetingElement.classList.add('text-reveal-animation-standalone');
+        if (!greetingElement.dataset.originalText) {
+            greetingElement.dataset.originalText = greetingElement.textContent || '';
+        }
+        updateGreeting(); // This will trigger its animation
     }
 
-    allCards.forEach(card => {
-        if (card === firstCard) { 
-            return;
-        }
+    // 2. Handle the daily question text animation immediately
+    displayRandomQuestion();
 
+    // 3. Set up the observer for the actual cards (excluding the greeting which is now separate)
+    const allContentCards = document.querySelectorAll('.card'); 
+    let initialCardDelay = 500; 
+
+    allContentCards.forEach(card => {
+        cardObserver.observe(card);
         const rect = card.getBoundingClientRect();
         const isVisibleOnLoad = (rect.top < window.innerHeight && rect.bottom > 0);
-
         if (isVisibleOnLoad) {
             setTimeout(() => {
                 revealCardAndTypewrite(card);
             }, initialCardDelay);
             initialCardDelay += 400; 
-        } else {
-            cardObserver.observe(card);
         }
     });
 });
@@ -140,13 +117,13 @@ function setDynamicBackgroundAndElements() {
     const now = new Date();
     const hour = now.getHours(); 
     let skyGradient, seaGradient, celestialColor, celestialSize, celestialBlur, celestialTop, celestialLeft;
-    let birdDisplay = 'none', planeDisplay = 'none', starDisplay = 'none'; // Permanently hide birds and planes
+    let birdDisplay = 'none', planeDisplay = 'none', starDisplay = 'none'; 
     let particleDisplay = 'block'; 
     let particleOpacity; 
     let celestialBlurIntensity; 
 
-    // Dimmed color palettes
-    if (hour >= 5 && hour < 7) { // Early Morning / Sunrise (5 AM - 6:59 AM) - Dimmed warm tones
+    // Dimmed color palettes - these remain consistent with previous request
+    if (hour >= 5 && hour < 7) { 
         skyGradient = 'linear-gradient(to bottom, #7a5d4e 0%, #6b4d53 50%, #5e707d 100%)'; 
         seaGradient = 'linear-gradient(to top, #2e4a5c, #3f5a7d)'; 
         celestialColor = '#e07b27'; 
@@ -155,7 +132,7 @@ function setDynamicBackgroundAndElements() {
         celestialTop = '35%'; 
         celestialLeft = '20%';
         particleOpacity = 0.3; 
-    } else if (hour >= 7 && hour < 12) { // Morning / Day (7 AM - 11:59 AM) - Dimmed bright blues
+    } else if (hour >= 7 && hour < 12) { 
         skyGradient = 'linear-gradient(to bottom, #4f7488 0%, #628292 70%, #7e98a7 100%)'; 
         seaGradient = 'linear-gradient(to top, #0f4a7c, #2f5f90)'; 
         celestialColor = '#b8aa3e'; 
@@ -164,7 +141,7 @@ function setDynamicBackgroundAndElements() {
         celestialTop = '20%';
         celestialLeft = '50%';
         particleOpacity = 0.4; 
-    } else if (hour >= 12 && hour < 17) { // Afternoon (12 PM - 4:59 PM) - Dimmed deep blues/purples
+    } else if (hour >= 12 && hour < 17) { 
         skyGradient = 'linear-gradient(to bottom, #3b336b 0%, #292451 60%, #6e8492 100%)'; 
         seaGradient = 'linear-gradient(to top, #00003b, #0f0f4a)'; 
         celestialColor = '#af6f1c'; 
@@ -173,7 +150,7 @@ function setDynamicBackgroundAndElements() {
         celestialTop = '25%';
         celestialLeft = '80%';
         particleOpacity = 0.3; 
-    } else if (hour >= 17 && hour < 19) { // Sunset (5 PM - 6:59 PM) - Dimmed dramatic tones
+    } else if (hour >= 17 && hour < 19) { 
         skyGradient = 'linear-gradient(to bottom, #993b2c 0%, #993300 50%, #5d0000 100%)'; 
         seaGradient = 'linear-gradient(to top, #2f5a7d, #3b336b)'; 
         celestialColor = '#b8aa3e'; 
@@ -182,7 +159,7 @@ function setDynamicBackgroundAndElements() {
         celestialTop = '45%'; 
         celestialLeft = '50%';
         particleOpacity = 0.2; 
-    } else { // Night (7 PM - 4:59 AM) - Deepest dimness, only stars visible
+    } else { 
         skyGradient = 'linear-gradient(to bottom, #000010 0%, #000020 50%, #000030 100%)'; 
         seaGradient = 'linear-gradient(to top, #000010, #000020)'; 
         celestialColor = '#a0a0a0'; 
@@ -230,37 +207,31 @@ function updateGreeting() {
     }
     
     const greetingElement = document.getElementById('greeting');
-    // Using the new class for greeting
-    let textRevealSpan = greetingElement.querySelector('.text-reveal-animation');
-    if (!textRevealSpan) { 
-        textRevealSpan = document.createElement('span');
-        textRevealSpan.classList.add('text-reveal-animation');
-        greetingElement.innerHTML = ''; 
-        greetingElement.appendChild(textRevealSpan);
+    if (greetingElement) {
+        // Apply the reveal effect to the standalone greeting with a small delay
+        applyTextRevealEffect(greetingElement, baseGreeting, 0.3); // Starts after 0.3s
     }
-    applyTextRevealEffect(textRevealSpan, baseGreeting, 0); // No initial delay for greeting
 }
-updateGreeting(); 
 
 // --- Rotating Questions Logic ---
 const questions = [
     "What's one thing you're looking forward to today?",
     "If you could have any superpower, what would it be?",
-    "What's your favorite memory with her so far?",
+    "What's a fun fact you learned recently?", // Neutralized
     "What's a small act of kindness you can do today?",
     "What's your go-to song when you need a boost?",
     "What's something new you want to learn?",
     "If you could travel anywhere, where would you go?",
     "What makes you smile the most?",
-    "What's your favorite thing about being in school?",
-    "What's a dream you have for the future?",
-    "What's one thing you appreciate about her?",
-    "If you could spend a day doing anything, what would it be?",
     "What's your favorite subject in school?",
+    "What's a dream you have for the future?",
+    "What's one thing that always brightens your day?", // Neutralized
+    "If you could spend a day doing anything, what would it be?",
+    "What's your favorite book or movie character?", // Neutralized
     "What's a funny memory you have?",
     "What's a goal you're working towards right now?",
     "What's your favorite way to relax?",
-    "If you could give one piece of advice to your past self, what would it be?",
+    "If you could give one piece of advice to your younger self, what would it be?",
     "What's your favorite season and why?",
     "What's a book or movie that has inspired you?",
     "What's something you're grateful for today?"
@@ -271,17 +242,9 @@ function displayRandomQuestion() {
     const questionText = questions[randomIndex];
     const dailyQuestionElement = document.getElementById('dailyQuestion');
     
-    // Using the new class for question
-    let textRevealSpan = dailyQuestionElement.querySelector('.text-reveal-animation');
-    if (!textRevealSpan) {
-        textRevealSpan = document.createElement('span');
-        textRevealSpan.classList.add('text-reveal-animation'); // No longer 'typed-once'
-        dailyQuestionElement.innerHTML = ''; 
-        dailyQuestionElement.appendChild(textRevealSpan);
-    }
-    applyTextRevealEffect(textRevealSpan, questionText, 0); // No initial delay for question
+    // Apply the reveal effect for the question
+    applyTextRevealEffect(dailyQuestionElement, questionText, 0.5); // Starts after 0.5s
 }
-displayRandomQuestion(); 
 
 // --- Countdown Timer Logic ---
 const targetDate = new Date("July 4, 2025 11:30:00 GMT+0530"); // Target: July 4th, 2025 11:30 AM IST
@@ -297,20 +260,18 @@ function updateCountdown() {
     const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
     if (distance < 0) {
-        // Special case for 'It's time!' to be revealed
-        let textRevealSpan = countdownElement.querySelector('.text-reveal-animation'); // New class
+        let textRevealSpan = countdownElement.querySelector('.text-reveal-animation');
         if (!textRevealSpan) { 
             textRevealSpan = document.createElement('span');
             textRevealSpan.classList.add('text-reveal-animation');
             countdownElement.innerHTML = ''; 
             countdownElement.appendChild(textRevealSpan);
             applyTextRevealEffect(textRevealSpan, "It's time! School has started! 🎉", 0);
-        } else if (textRevealSpan.textContent !== "It's time! School has started! 🎉") { // Check current text content
+        } else if (textRevealSpan.textContent !== "It's time! School has started! 🎉") {
             applyTextRevealEffect(textRevealSpan, "It's time! School has started! 🎉", 0);
         }
         clearInterval(countdownInterval); 
     } else {
-        // If countdown is active, display numbers directly (no animation needed for numbers)
         countdownElement.innerHTML =
             `<span class="number" style="--delay: 0s;">${days > 0 ? days + "d " : ""}</span>` +
             `<span class="number" style="--delay: 0.1s;">${hours < 10 ? "0" + hours : hours}h </span>` +
