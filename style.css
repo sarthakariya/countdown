@@ -84,10 +84,10 @@ body {
     left: 0;
     width: 300%; /* Wider than screen to allow continuous scroll */
     height: 100%;
-    /* Simple SVG cloud pattern - you can replace with an actual cloud image if desired */
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="100"><circle cx="50" cy="50" r="40" fill="rgba(255,255,255,0.7)"/><circle cx="100" cy="30" r="30" fill="rgba(255,255,255,0.6)"/><circle cx="150" cy="60" r="45" fill="rgba(255,255,255,0.5)"/></svg>');
+    /* IMPORTANT: Replace 'clouds.png' with the actual path to your downloaded cloud image! */
+    background-image: url('clouds.png'); 
     background-repeat: repeat-x;
-    background-size: 150px 75px; /* Adjust cloud size */
+    background-size: auto 100%; /* Adjusts cloud height to fit, maintaining aspect ratio */
     animation: cloudMovement 90s linear infinite; /* Slower, continuous movement */
     opacity: 0.3; /* Subtle transparency */
     z-index: 1; /* Below sun/moon */
@@ -235,16 +235,6 @@ h1 {
     text-shadow: 2px 2px 7px rgba(0, 0, 0, 0.4);
     transition: transform 0.2s ease-out;
 }
-
-/* Removed individual number styling as it's not needed with total hours display */
-/*
-#countdown .number {
-    display: inline-block;
-    animation: numberBounce 1s ease-out infinite;
-    animation-delay: var(--delay);
-    padding: 0 5px;
-}
-*/
 
 .message-box {
     border-left: 5px solid #FFC0CB;
