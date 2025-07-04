@@ -65,20 +65,6 @@ const cardObserver = new IntersectionObserver((entries, observer) => {
     });
 }, observerOptions);
 
-// --- Helper function to get a daily item (ensures it's the same for the whole day) ---
-function getDailyItem(itemsArray) {
-    const today = new Date();
-    // Calculate day of the year (0-364 or 365)
-    const start = new Date(today.getFullYear(), 0, 0);
-    const diff = (today - start) + ((start.getTimezoneOffset() - today.getTimezoneOffset()) * 60 * 1000);
-    const oneDay = 1000 * 60 * 60 * 24;
-    const dayOfYear = Math.floor(diff / oneDay);
-    
-    const index = dayOfYear % itemsArray.length;
-    return itemsArray[index];
-}
-
-
 // --- Initial setup for elements on page load ---
 document.addEventListener('DOMContentLoaded', () => {
     // Hide all cards initially and pre-populate text content
@@ -94,7 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // 1. Handle the standalone greeting text animation immediately
+    // Handle the standalone greeting text animation immediately
     const greetingElement = document.getElementById('greeting');
     if (greetingElement) {
         greetingElement.classList.add('text-reveal-animation-standalone');
@@ -104,27 +90,19 @@ document.addEventListener('DOMContentLoaded', () => {
         updateGreeting(); // This will trigger its animation
     }
 
-    // 2. Handle the daily question text animation immediately
-    displayRandomQuestion(); // Renamed to random, but daily via getDailyItem
-
-    // 3. Handle the daily inspiration text animation immediately
-    displayDailyInspiration();
-
-    // 4. Set up the observer for the actual cards (excluding the greeting which is now separate)
-    const allContentCards = document.querySelectorAll('.card'); 
-    let initialCardDelay = 500; 
-
-    allContentCards.forEach(card => {
-        cardObserver.observe(card);
-        const rect = card.getBoundingClientRect();
+    // Set up the observer for the main countdown card
+    const firstCard = document.getElementById('firstCardWithCountdown');
+    if (firstCard) {
+        cardObserver.observe(firstCard);
+        // Also reveal it immediately if it's visible on load
+        const rect = firstCard.getBoundingClientRect();
         const isVisibleOnLoad = (rect.top < window.innerHeight && rect.bottom > 0);
         if (isVisibleOnLoad) {
             setTimeout(() => {
-                revealCardAndTypewrite(card);
-            }, initialCardDelay);
-            initialCardDelay += 400; 
+                revealCardAndTypewrite(firstCard);
+            }, 500); // Small delay for greeting to appear first
         }
-    });
+    }
 });
 
 
@@ -227,64 +205,6 @@ function updateGreeting() {
         // Apply the reveal effect to the standalone greeting with a small delay
         applyTextRevealEffect(greetingElement, baseGreeting, 0.3); // Starts after 0.3s
     }
-}
-
-// --- Rotating Questions Logic ---
-const questions = [
-    "What's one thing you're looking forward to today?",
-    "If you could have any superpower, what would it be?",
-    "What's a small act of kindness you can do today?",
-    "What's your go-to song when you need a boost?",
-    "What's something new you want to learn?",
-    "If you could travel anywhere, where would you go?",
-    "What makes you smile the most?",
-    "What's your favorite subject in school?",
-    "What's a dream you have for the future?",
-    "What's one thing that always brightens your day?",
-    "If you could spend a day doing anything, what would it be?",
-    "What's your favorite book or movie character?",
-    "What's a funny memory you have?",
-    "What's a goal you're working towards right now?",
-    "What's your favorite way to relax?",
-    "If you could give one piece of advice to your younger self, what would it be?",
-    "What's your favorite season and why?",
-    "What's a book or movie that has inspired you?",
-    "What's something you're grateful for today?"
-];
-
-function displayRandomQuestion() {
-    const questionText = getDailyItem(questions); // Use getDailyItem for daily change
-    const dailyQuestionElement = document.getElementById('dailyQuestion');
-    
-    // Apply the reveal effect for the question
-    applyTextRevealEffect(dailyQuestionElement, questionText, 0.5); // Starts after 0.5s
-}
-
-// --- Daily Inspiration Logic ---
-const dailyInspirations = [
-    "You are capable of amazing things! Believe in yourself.",
-    "Every day is a new beginning. Make it count!",
-    "Kindness is a language everyone understands. Spread some joy!",
-    "Your unique perspective makes the world a better place.",
-    "Small steps lead to big journeys. Keep moving forward!",
-    "Embrace challenges; they help you grow stronger.",
-    "Find joy in the little moments. They add up!",
-    "Your potential is limitless. Explore it!",
-    "Be curious, be brave, be you!",
-    "A positive thought can change your whole day.",
-    "The best way to predict the future is to create it.",
-    "Today is a gift. Unpack it with enthusiasm!",
-    "Let your dreams be your wings.",
-    "You're stronger than you think. You got this!",
-    "Be the sunshine in someone's cloudy day."
-];
-
-function displayDailyInspiration() {
-    const inspirationText = getDailyItem(dailyInspirations); // Use getDailyItem for daily change
-    const dailyInspirationElement = document.getElementById('dailyInspirationText');
-    
-    // Apply the reveal effect for the inspiration
-    applyTextRevealEffect(dailyInspirationElement, inspirationText, 0.7); // Starts after 0.7s
 }
 
 
