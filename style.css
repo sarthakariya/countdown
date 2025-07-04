@@ -39,9 +39,53 @@
     50% { opacity: calc(var(--particle-opacity, 0.8) * 0.5); transform: scale(1.1); }
 }
 
-@keyframes cloudMovement {
+/* Cloud Layers Animations - Different Speeds for Parallax */
+@keyframes cloudMovement1 {
     0% { background-position: 0 0; }
-    100% { background-position: -200% 0; } /* Moves twice the width to ensure seamless loop */
+    100% { background-position: -200% 0; } /* Faster */
+}
+@keyframes cloudMovement2 {
+    0% { background-position: 0 0; }
+    100% { background-position: -200% 0; } /* Medium */
+}
+@keyframes cloudMovement3 {
+    0% { background-position: 0 0; }
+    100% { background-position: -200% 0; } /* Slower */
+}
+
+/* Bird and Plane Animations */
+@keyframes birdFly {
+    0% { transform: translateX(-10vw) translateY(50vh) rotateY(0deg); opacity: 0; }
+    10% { opacity: 1; }
+    50% { transform: translateX(50vw) translateY(20vh) rotateY(0deg); opacity: 1; }
+    90% { transform: translateX(110vw) translateY(60vh) rotateY(0deg); opacity: 0; }
+    100% { opacity: 0; }
+}
+@keyframes birdFly2 { /* Different path for second bird */
+    0% { transform: translateX(110vw) translateY(30vh) rotateY(180deg); opacity: 0; }
+    10% { opacity: 1; }
+    50% { transform: translateX(0vw) translateY(70vh) rotateY(180deg); opacity: 1; }
+    90% { transform: translateX(-10vw) translateY(20vh) rotateY(180deg); opacity: 0; }
+    100% { opacity: 0; }
+}
+@keyframes planeFly {
+    0% { transform: translateX(-20vw) translateY(80vh) rotate(5deg); opacity: 0; }
+    10% { opacity: 1; }
+    50% { transform: translateX(100vw) translateY(10vh) rotate(5deg); opacity: 1; }
+    100% { opacity: 0; }
+}
+
+/* Rain Effect */
+@keyframes raindropFall {
+    0% { transform: translateY(-100%); opacity: 0.8; }
+    100% { transform: translateY(100vh); opacity: 0; }
+}
+
+/* Lightning Effect */
+@keyframes lightning-flash {
+    0%, 100% { opacity: 0; }
+    5%, 15%, 25% { opacity: 0.8; }
+    10%, 20%, 30% { opacity: 0.3; }
 }
 
 
@@ -56,7 +100,7 @@ body {
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
-    min-height: 100vh; /* Set to 100vh as there's no more scrolling content */
+    min-height: 200vh; /* Allow scrolling for more content */
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -75,24 +119,37 @@ body {
     background: var(--sky-gradient);
     transition: background 2s ease-in-out, height 2s ease-in-out;
     z-index: 0;
-    overflow: hidden; /* Hide clouds overflowing outside this div */
+    overflow: hidden; /* Hide elements overflowing outside this div */
 }
 
+/* Cloud Layers */
 .clouds {
     position: absolute;
     top: 0;
     left: 0;
     width: 300%; /* Wider than screen to allow continuous scroll */
     height: 100%;
-    /* IMPORTANT: Ensure 'clouds.png' is in the same folder as your style.css! */
-    /* You NEED a transparent, seamless/tileable cloud image for this to look good. */
-    /* Change 'clouds.png' below to match your downloaded file's name if different. */
-    background-image: url('clouds.png'); 
-    background-repeat: repeat-x; /* This is why you need a seamless image! */
+    background-repeat: repeat-x;
     background-size: auto 100%; /* Adjusts cloud height to fit, maintaining aspect ratio */
-    animation: cloudMovement 90s linear infinite; /* Slower, continuous movement */
     opacity: 0.3; /* Subtle transparency */
     z-index: 1; /* Below sun/moon */
+}
+.clouds-layer-1 {
+    background-image: url('cloud-layer-1.png'); /* You need to provide this image */
+    animation: cloudMovement1 60s linear infinite; /* Fastest */
+    opacity: 0.4;
+    transform: scale(1.2); /* Slightly larger for closer feel */
+}
+.clouds-layer-2 {
+    background-image: url('cloud-layer-2.png'); /* You need to provide this image */
+    animation: cloudMovement2 90s linear infinite; /* Medium speed */
+    opacity: 0.3;
+}
+.clouds-layer-3 {
+    background-image: url('cloud-layer-3.png'); /* You need to provide this image */
+    animation: cloudMovement3 120s linear infinite; /* Slowest */
+    opacity: 0.2;
+    transform: scale(0.8); /* Slightly smaller for further feel */
 }
 
 .sea-bg {
@@ -122,12 +179,37 @@ body {
     animation: sunMoonMovement 20s ease-in-out infinite alternate;
     z-index: 2;
     transition: all 2s ease-in-out;
+    cursor: pointer; /* Indicates it's clickable */
 }
 
-/* Birds and Planes - Ensure they are hidden by default */
+/* Birds and Planes */
 .bird, .plane {
-    display: none; /* Permanently hide these elements */
+    position: fixed;
+    display: none; /* Controlled by JS */
+    pointer-events: none; /* Don't block clicks */
+    z-index: 3;
+    transition: opacity 0.5s ease-in-out;
 }
+.bird {
+    width: 30px; /* Small size for birds */
+    height: 30px;
+    background-image: url('bird.png'); /* You need to provide this image */
+    background-size: contain;
+    background-repeat: no-repeat;
+    animation: birdFly var(--bird-duration) linear infinite var(--bird-delay);
+}
+.bird-2 {
+    animation: birdFly2 var(--bird-duration) linear infinite var(--bird-delay);
+}
+.plane {
+    width: 80px; /* Larger size for plane */
+    height: 80px;
+    background-image: url('plane.png'); /* You need to provide this image */
+    background-size: contain;
+    background-repeat: no-repeat;
+    animation: planeFly var(--plane-duration) linear infinite var(--plane-delay);
+}
+
 
 /* Shooting Stars */
 .shooting-star {
@@ -156,17 +238,52 @@ body {
     display: var(--particle-display, block);
 }
 
-/* --- Main Content Area (Centered) --- */
+/* Rain Effect */
+.rain-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: 4; /* Above clouds, below sun/moon */
+    display: var(--rain-display, none);
+}
+.rain-drop {
+    position: absolute;
+    background-color: rgba(173, 216, 230, 0.6); /* Light blue, semi-transparent */
+    width: 2px;
+    height: 15px;
+    border-radius: 50%;
+    animation: raindropFall var(--rain-speed) linear infinite;
+}
+
+/* Lightning Effect */
+.lightning {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0); /* Invisible by default */
+    z-index: 6; /* Above most elements */
+    pointer-events: none;
+    animation: lightning-flash 3s infinite; /* Controlled by JS */
+    display: var(--lightning-display, none);
+}
+
+
+/* --- Main Content Area (Scrollable) --- */
 .content-container {
     position: relative;
     z-index: 10;
     display: flex;
     flex-direction: column;
-    justify-content: center; /* Vertically center content */
+    justify-content: flex-start;
     align-items: center;
     width: 100%;
-    padding: 50px 20px; /* Reduced vertical padding */
-    min-height: 100vh; /* Ensures it takes full viewport height for centering */
+    padding: 50px 20px 100px; /* Added back more padding for scrollable content */
+    min-height: 100vh; /* Retain for initial centering */
     box-sizing: border-box;
 }
 
@@ -238,10 +355,36 @@ h1 {
     transition: transform 0.2s ease-out;
 }
 
+/* Reintroduced: Daily Inspiration box styles */
+.inspiration-box {
+    border-left: 5px solid #FFD700; /* A lovely gold color for inspiration! */
+    padding: 20px 25px;
+    font-size: 1em;
+    line-height: 1.7;
+}
+
 .emoji {
     font-size: 1.6em;
     margin-right: 10px;
     vertical-align: middle;
+}
+
+/* Reintroduced: Daily Question box styles */
+.question-box {
+    font-size: 0.95em;
+    margin-top: 25px;
+    padding: 15px 20px;
+    border-radius: 10px;
+    border-left: 5px solid #FFC0CB; /* Pink border */
+}
+
+/* Reintroduced: Note box styles */
+.note {
+    margin-top: 35px;
+    font-size: 0.85em;
+    color: rgba(255, 255, 255, 0.75);
+    border-left: 5px solid #87CEEB; /* Sky blue border */
+    padding: 20px 25px;
 }
 
 /* --- Mobile-specific styles (max-width: 768px typically covers most phones and small tablets) --- */
@@ -255,7 +398,7 @@ h1 {
     #countdown {
         font-size: 2em; /* Smaller on phones */
     }
-    .card p, .question-box span, .inspiration-box p { /* Applies to general text in cards, question, and inspiration */
+    .card p, .question-box span, .inspiration-box p, .note p { /* Applies to general text in cards, question, inspiration, and note */
         font-size: 0.9em; /* Slightly smaller for general text */
     }
 }
