@@ -65,6 +65,19 @@ const cardObserver = new IntersectionObserver((entries, observer) => {
     });
 }, observerOptions);
 
+// --- Helper function to get a daily item (ensures it's the same for the whole day) ---
+function getDailyItem(itemsArray) {
+    const today = new Date();
+    // Calculate day of the year (0-364 or 365)
+    const start = new Date(today.getFullYear(), 0, 0);
+    const diff = (today - start) + ((start.getTimezoneOffset() - today.getTimezoneOffset()) * 60 * 1000);
+    const oneDay = 1000 * 60 * 60 * 24;
+    const dayOfYear = Math.floor(diff / oneDay);
+    
+    const index = dayOfYear % itemsArray.length;
+    return itemsArray[index];
+}
+
 
 // --- Initial setup for elements on page load ---
 document.addEventListener('DOMContentLoaded', () => {
@@ -92,9 +105,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // 2. Handle the daily question text animation immediately
-    displayRandomQuestion();
+    displayRandomQuestion(); // Renamed to random, but daily via getDailyItem
 
-    // 3. Set up the observer for the actual cards (excluding the greeting which is now separate)
+    // 3. Handle the daily inspiration text animation immediately
+    displayDailyInspiration();
+
+    // 4. Set up the observer for the actual cards (excluding the greeting which is now separate)
     const allContentCards = document.querySelectorAll('.card'); 
     let initialCardDelay = 500; 
 
@@ -237,13 +253,40 @@ const questions = [
 ];
 
 function displayRandomQuestion() {
-    const randomIndex = Math.floor(Math.random() * questions.length);
-    const questionText = questions[randomIndex];
+    const questionText = getDailyItem(questions); // Use getDailyItem for daily change
     const dailyQuestionElement = document.getElementById('dailyQuestion');
     
     // Apply the reveal effect for the question
     applyTextRevealEffect(dailyQuestionElement, questionText, 0.5); // Starts after 0.5s
 }
+
+// --- Daily Inspiration Logic ---
+const dailyInspirations = [
+    "You are capable of amazing things! Believe in yourself.",
+    "Every day is a new beginning. Make it count!",
+    "Kindness is a language everyone understands. Spread some joy!",
+    "Your unique perspective makes the world a better place.",
+    "Small steps lead to big journeys. Keep moving forward!",
+    "Embrace challenges; they help you grow stronger.",
+    "Find joy in the little moments. They add up!",
+    "Your potential is limitless. Explore it!",
+    "Be curious, be brave, be you!",
+    "A positive thought can change your whole day.",
+    "The best way to predict the future is to create it.",
+    "Today is a gift. Unpack it with enthusiasm!",
+    "Let your dreams be your wings.",
+    "You're stronger than you think. You got this!",
+    "Be the sunshine in someone's cloudy day."
+];
+
+function displayDailyInspiration() {
+    const inspirationText = getDailyItem(dailyInspirations); // Use getDailyItem for daily change
+    const dailyInspirationElement = document.getElementById('dailyInspirationText');
+    
+    // Apply the reveal effect for the inspiration
+    applyTextRevealEffect(dailyInspirationElement, inspirationText, 0.7); // Starts after 0.7s
+}
+
 
 // --- Countdown Timer Logic ---
 const countdownElement = document.getElementById('countdown');
