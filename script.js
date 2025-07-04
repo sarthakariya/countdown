@@ -14,7 +14,7 @@ function createParticles(count, minSize, maxSize, animationDuration, animationDe
         body.appendChild(particle);
     }
 }
-createParticles(50, 1, 3, 5, 5); 
+createParticles(70, 1, 4, 6, 6); // More particles, slightly larger
 
 // --- Helper function for fade-in/scale-up text animation ---
 function applyTextRevealEffect(element, originalText, delay = 0) {
@@ -65,6 +65,26 @@ const cardObserver = new IntersectionObserver((entries, observer) => {
     });
 }, observerOptions);
 
+// --- Helper function to get a truly random item (different on every reload) ---
+function getRandomItem(itemsArray) {
+    const randomIndex = Math.floor(Math.random() * itemsArray.length);
+    return itemsArray[randomIndex];
+}
+
+// --- Helper function to get a daily item (ensures it's the same for the whole day) ---
+function getDailyItem(itemsArray) {
+    const today = new Date();
+    // Calculate day of the year (0-364 or 365)
+    const start = new Date(today.getFullYear(), 0, 0);
+    const diff = (today - start) + ((start.getTimezoneOffset() - today.getTimezoneOffset()) * 60 * 1000);
+    const oneDay = 1000 * 60 * 60 * 24;
+    const dayOfYear = Math.floor(diff / oneDay);
+    
+    const index = dayOfYear % itemsArray.length;
+    return itemsArray[index];
+}
+
+
 // --- Initial setup for elements on page load ---
 document.addEventListener('DOMContentLoaded', () => {
     // Hide all cards initially and pre-populate text content
@@ -80,7 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Handle the standalone greeting text animation immediately
+    // 1. Handle the standalone greeting text animation immediately
     const greetingElement = document.getElementById('greeting');
     if (greetingElement) {
         greetingElement.classList.add('text-reveal-animation-standalone');
@@ -90,19 +110,27 @@ document.addEventListener('DOMContentLoaded', () => {
         updateGreeting(); // This will trigger its animation
     }
 
-    // Set up the observer for the main countdown card
-    const firstCard = document.getElementById('firstCardWithCountdown');
-    if (firstCard) {
-        cardObserver.observe(firstCard);
-        // Also reveal it immediately if it's visible on load
-        const rect = firstCard.getBoundingClientRect();
+    // 2. Handle the daily question text animation immediately
+    displayRandomQuestion(); 
+
+    // 3. Handle the special message for Reechita (was daily inspiration)
+    displaySpecialMessageForReechita(); // Renamed function call
+
+    // 4. Set up the observer for all content cards
+    const allContentCards = document.querySelectorAll('.card'); 
+    let initialCardDelay = 500; 
+
+    allContentCards.forEach(card => {
+        cardObserver.observe(card);
+        const rect = card.getBoundingClientRect();
         const isVisibleOnLoad = (rect.top < window.innerHeight && rect.bottom > 0);
         if (isVisibleOnLoad) {
             setTimeout(() => {
-                revealCardAndTypewrite(firstCard);
-            }, 500); // Small delay for greeting to appear first
+                revealCardAndTypewrite(card);
+            }, initialCardDelay);
+            initialCardDelay += 400; 
         }
-    }
+    });
 });
 
 
@@ -115,6 +143,8 @@ function setDynamicBackgroundAndElements() {
     let particleDisplay = 'block'; 
     let particleOpacity; 
     let celestialBlurIntensity; 
+    let rainDisplay = 'none';
+    let lightningDisplay = 'none';
 
     // Dimmed color palettes - these remain consistent with previous request
     if (hour >= 5 && hour < 7) { 
@@ -126,6 +156,7 @@ function setDynamicBackgroundAndElements() {
         celestialTop = '35%'; 
         celestialLeft = '20%';
         particleOpacity = 0.3; 
+        birdDisplay = 'block';
     } else if (hour >= 7 && hour < 12) { 
         skyGradient = 'linear-gradient(to bottom, #4f7488 0%, #628292 70%, #7e98a7 100%)'; 
         seaGradient = 'linear-gradient(to top, #0f4a7c, #2f5f90)'; 
@@ -135,6 +166,8 @@ function setDynamicBackgroundAndElements() {
         celestialTop = '20%';
         celestialLeft = '50%';
         particleOpacity = 0.4; 
+        birdDisplay = 'block';
+        planeDisplay = 'block';
     } else if (hour >= 12 && hour < 17) { 
         skyGradient = 'linear-gradient(to bottom, #3b336b 0%, #292451 60%, #6e8492 100%)'; 
         seaGradient = 'linear-gradient(to top, #00003b, #0f0f4a)'; 
@@ -144,6 +177,11 @@ function setDynamicBackgroundAndElements() {
         celestialTop = '25%';
         celestialLeft = '80%';
         particleOpacity = 0.3; 
+        birdDisplay = 'block';
+        planeDisplay = 'block';
+        if (Math.random() < 0.1) { // 10% chance of rain during the day
+            rainDisplay = 'block';
+        }
     } else if (hour >= 17 && hour < 19) { 
         skyGradient = 'linear-gradient(to bottom, #993b2c 0%, #993300 50%, #5d0000 100%)'; 
         seaGradient = 'linear-gradient(to top, #2f5a7d, #3b336b)'; 
@@ -153,6 +191,7 @@ function setDynamicBackgroundAndElements() {
         celestialTop = '45%'; 
         celestialLeft = '50%';
         particleOpacity = 0.2; 
+        birdDisplay = 'block'; // Birds during evening too
     } else { 
         skyGradient = 'linear-gradient(to bottom, #000010 0%, #000020 50%, #000030 100%)'; 
         seaGradient = 'linear-gradient(to top, #000010, #000020)'; 
@@ -164,6 +203,9 @@ function setDynamicBackgroundAndElements() {
         
         starDisplay = 'block'; 
         particleOpacity = 0.05; 
+        if (Math.random() < 0.05) { // 5% chance of lightning at night
+            lightningDisplay = 'block';
+        }
     }
 
     document.documentElement.style.setProperty('--sky-gradient', skyGradient);
@@ -174,17 +216,21 @@ function setDynamicBackgroundAndElements() {
     document.documentElement.style.setProperty('--celestial-top', celestialTop);
     document.documentElement.style.setProperty('--celestial-left', celestialLeft);
 
+    // Control visibility of birds, planes, stars, particles, rain, and lightning
     document.querySelectorAll('.bird').forEach(el => el.style.display = birdDisplay);
     document.querySelectorAll('.plane').forEach(el => el.style.display = planeDisplay);
     document.querySelectorAll('.shooting-star').forEach(el => el.style.display = starDisplay);
     document.querySelectorAll('.particle').forEach(el => el.style.setProperty('--particle-opacity', particleOpacity));
     document.documentElement.style.setProperty('--particle-display', particleDisplay); 
+    document.documentElement.style.setProperty('--rain-display', rainDisplay);
+    document.documentElement.style.setProperty('--lightning-display', lightningDisplay);
 
     document.documentElement.style.setProperty('--sky-height', '70%');
     document.documentElement.style.setProperty('--sea-height', '30%');
 }
 setDynamicBackgroundAndElements();
-setInterval(setDynamicBackgroundAndElements, 10 * 60 * 1000); 
+setInterval(setDynamicBackgroundAndElements, 10 * 60 * 1000); // Update every 10 minutes
+
 
 // --- Greeting Logic ---
 function updateGreeting() {
@@ -206,6 +252,98 @@ function updateGreeting() {
         applyTextRevealEffect(greetingElement, baseGreeting, 0.3); // Starts after 0.3s
     }
 }
+
+// --- Rotating Questions Logic ---
+const questions = [
+    "What's one thing you're looking forward to today?",
+    "If you could have any superpower, what would it be?",
+    "What's a small act of kindness you can do today?",
+    "What's your go-to song when you need a boost?",
+    "What's something new you want to learn?",
+    "If you could travel anywhere, where would you go?",
+    "What makes you smile the most?",
+    "What's your favorite subject in school?",
+    "What's a dream you have for the future?",
+    "What's one thing that always brightens your day?",
+    "If you could spend a day doing anything, what would it be?",
+    "What's your favorite book or movie character?",
+    "What's a funny memory you have?",
+    "What's a goal you're working towards right now?",
+    "What's your favorite way to relax?",
+    "If you could give one piece of advice to your younger self, what would it be?",
+    "What's your favorite season and why?",
+    "What's a book or movie that has inspired you?",
+    "What's something you're grateful for today?"
+];
+
+function displayRandomQuestion() {
+    const questionText = getDailyItem(questions); // Use getDailyItem for daily change
+    const dailyQuestionElement = document.getElementById('dailyQuestion');
+    
+    // Apply the reveal effect for the question
+    applyTextRevealEffect(dailyQuestionElement, questionText, 0.5); // Starts after 0.5s
+}
+
+// --- Special Messages for Reechita (Indirect "I love you") ---
+const sarthakLoveMessages = [
+    "My world feels a little brighter when you're around. ✨",
+    "Thinking of you often brings a smile to my face. 😊",
+    "You have a way of making everything feel special. 💖",
+    "Hope your day is as wonderful as you make mine. 🌟",
+    "Your presence always brings a sense of warmth. 🔥",
+    "I appreciate all the small, amazing things about you. 💫",
+    "Looking forward to our next conversation, always. 💬",
+    "Even a simple moment feels better when shared with you. 👩‍❤️‍👨",
+    "You're an amazing person, and I hope you know that. 👑",
+    "Here's to all the beautiful moments, past and future. 🎉",
+    "You bring so much light into the lives around you. 💡",
+    "Just a little reminder that you're truly special. ✨",
+    "Wishing you a day filled with all the happiness you deserve. 😄",
+    "You make the ordinary feel extraordinary. 🌈",
+    "There's something uniquely wonderful about you. ❤️",
+    "Hope you're having a day as lovely as your presence is. 🌸",
+    "You inspire me in more ways than you know. 🚀",
+    "Every moment becomes a cherished memory with you. 📸",
+    "My favorite adventures involve you. 🗺️",
+    "Your kindness is a gift to everyone around you. 🎁"
+];
+
+function displaySpecialMessageForReechita() { // Renamed function
+    const messageText = getRandomItem(sarthakLoveMessages); // Use getRandomItem for different message on each reload
+    const dailyInspirationElement = document.getElementById('dailyInspirationText'); // Keep existing ID
+    
+    // Apply the reveal effect for the message
+    applyTextRevealEffect(dailyInspirationElement, messageText, 0.7); // Starts after 0.7s
+}
+
+// --- Rain Effect Generation ---
+function createRainDrops(container, count) {
+    for (let i = 0; i < count; i++) {
+        const drop = document.createElement('div');
+        drop.classList.add('rain-drop');
+        drop.style.left = `${Math.random() * 100}vw`;
+        drop.style.animationDuration = `${Math.random() * 0.8 + 0.4}s`; // Faster drops
+        drop.style.animationDelay = `${Math.random() * 2}s`;
+        container.appendChild(drop);
+    }
+}
+const rainContainer = document.querySelector('.rain-container');
+createRainDrops(rainContainer, 100); // Create 100 rain drops
+
+// --- Interactive Sun/Moon Click Effect ---
+const sunMoon = document.querySelector('.sun-moon');
+sunMoon.addEventListener('click', () => {
+    // A simple animation on click - scale up and down quickly
+    sunMoon.style.transition = 'none'; // Disable smooth transition temporarily
+    sunMoon.style.transform = 'scale(1.1)';
+    setTimeout(() => {
+        sunMoon.style.transform = 'scale(1)';
+        sunMoon.style.transition = 'all 2s ease-in-out'; // Re-enable transition
+    }, 150);
+
+    // Optional: Play a subtle sound or show a temporary text bubble
+    console.log("Sun/Moon clicked!"); 
+});
 
 
 // --- Countdown Timer Logic ---
