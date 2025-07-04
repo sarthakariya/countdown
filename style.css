@@ -84,9 +84,11 @@ body {
     left: 0;
     width: 300%; /* Wider than screen to allow continuous scroll */
     height: 100%;
-    /* IMPORTANT: Replace 'clouds.png' with the actual path to your downloaded cloud image! */
+    /* IMPORTANT: Ensure 'clouds.png' is in the same folder as your style.css! */
+    /* You NEED a transparent, seamless/tileable cloud image for this to look good. */
+    /* Change 'clouds.png' below to match your downloaded file's name if different. */
     background-image: url('clouds.png'); 
-    background-repeat: repeat-x;
+    background-repeat: repeat-x; /* This is why you need a seamless image! */
     background-size: auto 100%; /* Adjusts cloud height to fit, maintaining aspect ratio */
     animation: cloudMovement 90s linear infinite; /* Slower, continuous movement */
     opacity: 0.3; /* Subtle transparency */
