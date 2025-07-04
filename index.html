@@ -12,13 +12,23 @@
 <body>
 
     <div class="sky-bg">
-        <div class="clouds"></div> </div>
+        <div class="clouds clouds-layer-1"></div>
+        <div class="clouds clouds-layer-2"></div>
+        <div class="clouds clouds-layer-3"></div>
+        
+        <div class="rain-container"></div>
+        <div class="lightning"></div>
+    </div>
     <div class="sea-bg"></div>
     <div class="sun-moon"></div>
 
     <div class="shooting-star"></div>
     <div class="shooting-star"></div>
     <div class="shooting-star"></div>
+
+    <div class="bird"></div>
+    <div class="bird bird-2"></div>
+    <div class="plane"></div>
 
     <div class="content-container">
         
@@ -28,7 +38,29 @@
             <h1 class="text-reveal-animation">Our Next Meeting! ✨</h1>
             <div id="countdown"></div>
         </div>
-        
+
+        <div class="card inspiration-box" id="dailyInspirationCard">
+            <p><span class="emoji">🌟</span> <span class="text-reveal-animation" id="dailyInspirationText"></span></p>
+        </div>
+
+        <div class="card question-box" id="questionCard">
+            <span class="text-reveal-animation" id="dailyQuestion"></span>
+        </div>
+
+        <div class="card note" id="noteCard">
+            <p><span class="text-reveal-animation">Counting down to the next school day at 11:30 AM IST. Make it count!</span></p>
+            <p style="font-size: 0.7em; margin-top: 10px;"><span class="text-reveal-animation"> (Scroll down for more details!) 🎉</span></p>
+        </div>
+
+        <div class="card" style="margin-top: 100px; padding: 30px;" id="extraCard1">
+            <p><span class="text-reveal-animation">Hey Reechita! Hope you're doing great. This is a space for all those little things that make your day brighter.</span></p>
+            <p style="margin-top: 15px;"><span class="text-reveal-animation">Think about a happy memory, or a fun plan you have. Keep shining!</span></p>
+            <p style="font-size: 0.8em; margin-top: 15px;"><span class="text-reveal-animation">"The greatest glory in living lies not in never falling, but in rising every time we fall." - Nelson Mandela</span></p>
+        </div>
+        <div class="card" style="margin-top: 50px; padding: 30px;" id="extraCard2">
+            <p><span class="text-reveal-animation">"Success is not final, failure is not fatal: it is the courage to continue that counts." - Winston Churchill</span></p>
+            <p style="margin-top: 15px;"><span class="text-reveal-animation">Remember to always be curious and keep exploring new things!</span></p>
+        </div>
     </div>
 
     <script src="script.js"></script>
