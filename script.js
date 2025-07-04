@@ -14,7 +14,7 @@ function createParticles(count, minSize, maxSize, animationDuration, animationDe
         body.appendChild(particle);
     }
 }
-createParticles(50, 1, 3, 5, 5); // Reduced particle count from 100 to 50 for simplicity.
+createParticles(50, 1, 3, 5, 5); 
 
 // --- Helper function for fade-in/scale-up text animation ---
 function applyTextRevealEffect(element, originalText, delay = 0) {
@@ -246,38 +246,92 @@ function displayRandomQuestion() {
 }
 
 // --- Countdown Timer Logic ---
-const targetDate = new Date("July 4, 2025 11:30:00 GMT+0530"); // Target: July 4th, 2025 11:30 AM IST
 const countdownElement = document.getElementById('countdown');
 
-function updateCountdown() {
-    const now = new Date().getTime();
-    const distance = targetDate.getTime() - now;
+// Sample Indian Holidays (add more 'YYYY-MM-DD' strings as needed)
+const indianHolidays = [
+    "2025-07-06", // Example: Guru Purnima
+    "2025-07-15", // Example: Muharram
+    // Add more holidays here as 'YYYY-MM-DD' strings.
+    // Example: "2025-08-15" for Independence Day
+    // Make sure to update this list each year as holiday dates can change!
+];
 
-    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+function isHoliday(date) {
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const month = (d.getMonth() + 1).toString().padStart(2, '0');
+    const day = d.getDate().toString().padStart(2, '0');
+    const dateString = `${year}-${month}-${day}`;
+    return indianHolidays.includes(dateString);
+}
+
+function getNextSchoolTime() {
+    let nextSchoolDate = new Date();
+    nextSchoolDate.setHours(11);
+    nextSchoolDate.setMinutes(30);
+    nextSchoolDate.setSeconds(0);
+    nextSchoolDate.setMilliseconds(0);
+
+    // If current time is past 11:30 AM for today, start looking from tomorrow
+    const now = new Date();
+    if (now.getHours() > 11 || (now.getHours() === 11 && now.getMinutes() >= 30)) {
+        nextSchoolDate.setDate(nextSchoolDate.getDate() + 1);
+    }
+    
+    // Loop to find the next valid school day
+    while (true) {
+        const dayOfWeek = nextSchoolDate.getDay(); // 0 = Sunday, 6 = Saturday
+        if (dayOfWeek === 0 || dayOfWeek === 6 || isHoliday(nextSchoolDate)) {
+            nextSchoolDate.setDate(nextSchoolDate.getDate() + 1); // Move to next day
+            nextSchoolDate.setHours(11); // Reset hour/minute/second to 11:30:00 for the new day
+            nextSchoolDate.setMinutes(30);
+            nextSchoolDate.setSeconds(0);
+            nextSchoolDate.setMilliseconds(0);
+        } else {
+            break; // Found a school day!
+        }
+    }
+    return nextSchoolDate;
+}
+
+function updateCountdown() {
+    const targetDate = getNextSchoolTime(); // Dynamically get the next school time
+    const now = new Date().getTime();
+    let distance = targetDate.getTime() - now;
 
     if (distance < 0) {
+        // School time has passed for today
         let textRevealSpan = countdownElement.querySelector('.text-reveal-animation');
         if (!textRevealSpan) { 
             textRevealSpan = document.createElement('span');
             textRevealSpan.classList.add('text-reveal-animation');
             countdownElement.innerHTML = ''; 
             countdownElement.appendChild(textRevealSpan);
-            applyTextRevealEffect(textRevealSpan, "It's time! School has started! 🎉", 0);
-        } else if (textRevealSpan.textContent !== "It's time! School has started! 🎉") {
-            applyTextRevealEffect(textRevealSpan, "It's time! School has started! 🎉", 0);
         }
-        clearInterval(countdownInterval); 
+        applyTextRevealEffect(textRevealSpan, "School is currently on! 🎉", 0); 
+        
+        // After a brief display, re-calculate for the *next* valid school time (which would be tomorrow or later)
+        // This prevents immediate re-calculation causing flicker and ensures new target is for the next session
+        setTimeout(() => {
+            updateCountdown(); // Re-run to update the target to the next school day
+        }, 5000); // Wait 5 seconds before showing countdown to next school day
+        return; 
     } else {
+        // Calculate total hours, minutes, seconds from the remaining distance
+        const totalSeconds = Math.floor(distance / 1000);
+        const totalMinutes = Math.floor(totalSeconds / 60);
+        const totalHours = Math.floor(totalMinutes / 60);
+
+        const remainingSeconds = totalSeconds % 60;
+        const remainingMinutes = totalMinutes % 60;
+
         countdownElement.innerHTML =
-            `<span class="number" style="--delay: 0s;">${days > 0 ? days + "d " : ""}</span>` +
-            `<span class="number" style="--delay: 0.1s;">${hours < 10 ? "0" + hours : hours}h </span>` +
-            `<span class="number" style="--delay: 0.2s;">${minutes < 10 ? "0" + minutes : minutes}m </span>` +
-            `<span class="number" style="--delay: 0.3s;">${seconds < 10 ? "0" + seconds : seconds}s</span>`;
+            `<span class="number" style="--delay: 0s;">${totalHours}h </span>` +
+            `<span class="number" style="--delay: 0.1s;">${remainingMinutes < 10 ? "0" + remainingMinutes : remainingMinutes}m </span>` +
+            `<span class="number" style="--delay: 0.2s;">${remainingSeconds < 10 ? "0" + remainingSeconds : remainingSeconds}s</span>`;
     }
 }
 
 const countdownInterval = setInterval(updateCountdown, 1000);
-updateCountdown();
+updateCountdown(); // Initial call to display countdown immediately
