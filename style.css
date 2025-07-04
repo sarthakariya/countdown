@@ -39,6 +39,11 @@
     50% { opacity: calc(var(--particle-opacity, 0.8) * 0.5); transform: scale(1.1); }
 }
 
+@keyframes cloudMovement {
+    0% { background-position: 0 0; }
+    100% { background-position: -200% 0; } /* Moves twice the width to ensure seamless loop */
+}
+
 
 /* --- Base Styles --- */
 html {
@@ -70,6 +75,22 @@ body {
     background: var(--sky-gradient);
     transition: background 2s ease-in-out, height 2s ease-in-out;
     z-index: 0;
+    overflow: hidden; /* Hide clouds overflowing outside this div */
+}
+
+.clouds {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 300%; /* Wider than screen to allow continuous scroll */
+    height: 100%;
+    /* Simple SVG cloud pattern - you can replace with an actual cloud image if desired */
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="100"><circle cx="50" cy="50" r="40" fill="rgba(255,255,255,0.7)"/><circle cx="100" cy="30" r="30" fill="rgba(255,255,255,0.6)"/><circle cx="150" cy="60" r="45" fill="rgba(255,255,255,0.5)"/></svg>');
+    background-repeat: repeat-x;
+    background-size: 150px 75px; /* Adjust cloud size */
+    animation: cloudMovement 90s linear infinite; /* Slower, continuous movement */
+    opacity: 0.3; /* Subtle transparency */
+    z-index: 1; /* Below sun/moon */
 }
 
 .sea-bg {
@@ -215,12 +236,15 @@ h1 {
     transition: transform 0.2s ease-out;
 }
 
+/* Removed individual number styling as it's not needed with total hours display */
+/*
 #countdown .number {
     display: inline-block;
     animation: numberBounce 1s ease-out infinite;
     animation-delay: var(--delay);
     padding: 0 5px;
 }
+*/
 
 .message-box {
     border-left: 5px solid #FFC0CB;
@@ -246,4 +270,20 @@ h1 {
     margin-top: 35px;
     font-size: 0.85em;
     color: rgba(255, 255, 255, 0.75);
+}
+
+/* --- Mobile-specific styles (max-width: 768px typically covers most phones and small tablets) --- */
+@media (max-width: 768px) {
+    #greeting {
+        font-size: 2em; /* Smaller on phones */
+    }
+    .card h1 {
+        font-size: 1.8em; /* Smaller on phones */
+    }
+    #countdown {
+        font-size: 2em; /* Smaller on phones */
+    }
+    .card p, .question-box span { /* Applies to general text in cards and the question */
+        font-size: 0.9em; /* Slightly smaller for general text */
+    }
 }
