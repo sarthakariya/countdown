@@ -149,7 +149,7 @@ function setDynamicBackgroundAndElements() {
     // Dimmed color palettes - these remain consistent with previous request
     if (hour >= 5 && hour < 7) { 
         skyGradient = 'linear-gradient(to bottom, #7a5d4e 0%, #6b4d53 50%, #5e707d 100%)'; 
-        seaGradient = 'linear-gradient(to top, #2e4a5c, #3f5a7d)'; 
+        seaGradient = 'linear-gradient(to top, #2e4a7c, #3f5a7d)'; 
         celestialColor = '#e07b27'; 
         celestialSize = '80px';
         celestialBlurIntensity = '20px'; 
